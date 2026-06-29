@@ -86,6 +86,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const cursorDot = document.querySelector('[data-cursor-dot]');
 
   if (cursor && cursorDot && window.matchMedia('(pointer: fine)').matches) {
+    // Réticule d'autofocus : 4 équerres + étiquette
+    cursor.innerHTML =
+      '<i class="cursor__c cursor__c--tl"></i>' +
+      '<i class="cursor__c cursor__c--tr"></i>' +
+      '<i class="cursor__c cursor__c--bl"></i>' +
+      '<i class="cursor__c cursor__c--br"></i>' +
+      '<span class="cursor__tag">AF</span>';
+
     let mouseX = 0, mouseY = 0;
     let curX = 0, curY = 0;
 
@@ -186,6 +194,78 @@ document.addEventListener('DOMContentLoaded', () => {
       }, { passive: true });
       btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
     });
+  }
+
+  /* ---------- HUD SCROLL : barre pellicule (haut) + timecode (bas) ---------- */
+  (function () {
+    const scrub = document.createElement('div');
+    scrub.className = 'scrub';
+    scrub.innerHTML = '<div class="scrub__bar"></div>';
+    document.body.appendChild(scrub);
+
+    let hudTc = null;
+    if (FX_OK) {
+      const hud = document.createElement('div');
+      hud.className = 'hud-scroll';
+      hud.innerHTML =
+        '<span class="hud-scroll__dot"></span><span>REC</span>' +
+        '<span class="hud-scroll__sep">·</span><span class="hud-scroll__tc">00:00</span>';
+      document.body.appendChild(hud);
+      hudTc = hud.querySelector('.hud-scroll__tc');
+    }
+
+    const pad = n => String(n).padStart(2, '0');
+    let ticking = false;
+    function update() {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      const p = max > 0 ? Math.min(h.scrollTop / max, 1) : 0;
+      h.style.setProperty('--scroll', (p * 100).toFixed(2) + '%');
+      if (hudTc) {
+        const t = Math.round(p * 180); // faux timecode sur ~3 min
+        hudTc.textContent = pad(Math.floor(t / 60)) + ':' + pad(t % 60);
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+    update();
+  })();
+
+  /* ---------- DÉCODAGE TEXTE (labels HUD s'assemblent caractère par caractère) ---------- */
+  if (FX_OK) {
+    const GLYPHS = '█▓▒░<>/\\=*+:.#0123456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+    function decode(el) {
+      const original = el.dataset.text || el.textContent;
+      el.dataset.text = original;
+      const chars = original.split('');
+      const total = 16;
+      let frame = 0;
+      el.classList.add('is-decoding');
+      const id = setInterval(() => {
+        frame++;
+        const revealed = Math.floor((frame / total) * chars.length);
+        el.textContent = chars.map((c, i) => {
+          if (c === ' ') return ' ';
+          if (i < revealed) return c;
+          return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+        }).join('');
+        if (frame >= total) {
+          clearInterval(id);
+          el.textContent = original;
+          el.classList.remove('is-decoding');
+        }
+      }, 30);
+    }
+    const decodeObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { decode(e.target); decodeObs.unobserve(e.target); }
+      });
+    }, { threshold: 0.6 });
+    document.querySelectorAll('.section-head__num, .hero__meta-item, .manifesto__label')
+      .forEach(el => decodeObs.observe(el));
   }
 
   /* ---------- SCROLL REVEAL ---------- */
