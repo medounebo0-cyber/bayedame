@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /avis.html
+Allow: /legal.html
+Disallow: /admin.html
+Disallow: /admin-project.html
+Disallow: /projet.html
+Disallow: /quote-print.html
+
+Sitemap: https://bayedame.netlify.app/sitemap.xml

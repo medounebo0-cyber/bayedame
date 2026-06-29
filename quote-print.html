@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Devis — Medoune Bo</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f3e3bf;        /* Beige Canva */
+      --paper-deep: #e8d5a3;   /* Beige plus saturé */
+      --ink: #0a0a0a;
+      --ink-dim: #4a4540;
+      --ink-soft: #7a7368;
+      --line: rgba(10, 10, 10, 0.12);
+      --line-strong: rgba(10, 10, 10, 0.65);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #2a2522;
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    /* ===== CONTROLS BAR (non imprimable) ===== */
+    .controls {
+      max-width: 800px;
+      margin: 0 auto 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #f2ede4;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .controls h1 { font-size: 14px; font-weight: 500; letter-spacing: 0.05em; }
+    .controls__actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 500;
+    }
+    .btn-print { background: #c8743a; color: #f2ede4; }
+    .btn-print:hover { opacity: 0.9; }
+    .btn-back {
+      background: transparent;
+      color: #f2ede4;
+      border: 1px solid rgba(242,237,228,0.3);
+    }
+    .btn-back:hover { background: rgba(242,237,228,0.1); }
+
+    /* ===== PAPER (style Canva beige/noir) ===== */
+    .paper {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--paper);
+      color: var(--ink);
+      padding: 48px 56px 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+      position: relative;
+      min-height: 1100px;
+      font-family: 'DM Sans', 'Inter', sans-serif;
+    }
+
+    /* ===== HEADER : DEVIS en énorme + badge numéro + soleil ===== */
+    .doc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 36px;
+    }
+    .doc-head__left {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .doc-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 76px;
+      font-weight: 700;
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      color: var(--ink);
+    }
+    .doc-num {
+      display: inline-block;
+      padding: 6px 14px;
+      border: 1.5px solid var(--ink);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      width: fit-content;
+      margin-top: 4px;
+    }
+    .doc-sun {
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+      margin-top: 12px;
+    }
+
+    /* ===== DATES ===== */
+    .dates {
+      margin-bottom: 28px;
+    }
+    .date-line {
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .date-line strong { font-weight: 600; }
+
+    /* ===== PARTIES (Émetteur + Client) ===== */
+    .parties {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 32px;
+    }
+    .party h3 {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+    }
+    .party p {
+      line-height: 1.65;
+      font-size: 12px;
+    }
+    .party--right { text-align: right; }
+    .party--right h3 {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--ink-dim);
+      margin-bottom: 8px;
+    }
+
+    /* ===== ITEMS TABLE ===== */
+    .items {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 0;
+    }
+    .items thead th {
+      background: var(--ink);
+      color: var(--paper);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 11px 14px;
+      text-align: left;
+    }
+    .items thead th:nth-child(2),
+    .items thead th:nth-child(3) { text-align: center; }
+    .items thead th:nth-child(4) { text-align: right; }
+
+    .items tbody td {
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      vertical-align: middle;
+    }
+    .items tbody td:nth-child(2),
+    .items tbody td:nth-child(3) { text-align: center; font-variant-numeric: tabular-nums; }
+    .items tbody td:nth-child(4) {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+    .item-desc {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .item-desc__title {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 12px;
+    }
+    .item-desc__sub {
+      font-size: 11px;
+      color: var(--ink-soft);
+      line-height: 1.4;
+    }
+
+    /* ===== TOTAL HT (bandeau noir comme Canva) ===== */
+    .total-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: stretch;
+      margin: 8px 0 8px 35%;
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .total-bar__label {
+      padding: 14px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      flex: 1;
+      text-align: right;
+    }
+    .total-bar__amount {
+      padding: 14px 22px;
+      font-size: 15px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      background: var(--ink);
+      border-left: 1px solid rgba(255,255,255,0.15);
+      white-space: nowrap;
+    }
+
+    .vat-mention {
+      text-align: right;
+      font-size: 10px;
+      font-style: italic;
+      color: var(--ink-soft);
+      margin-bottom: 36px;
+    }
+
+    /* ===== INTER-TOTAUX (sous-total, TVA, TTC quand TVA appliquée) ===== */
+    .totals-extras {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin: 8px 0 8px 50%;
+      padding: 10px 18px 0;
+    }
+    .totals-extras__row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+    .totals-extras__row span:last-child { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+    /* ===== TERMES ET CONDITIONS ===== */
+    .terms {
+      margin-top: 36px;
+    }
+    .terms h3 {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .terms ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .terms li {
+      font-size: 12px;
+      line-height: 1.7;
+      padding-left: 18px;
+      position: relative;
+      margin-bottom: 2px;
+    }
+    .terms li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .notes {
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      font-style: italic;
+      color: var(--ink-soft);
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    /* ===== FOOTER ===== */
+    .doc-foot {
+      margin-top: 48px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      font-size: 10px;
+      color: var(--ink-soft);
+      letter-spacing: 0.05em;
+    }
+
+    /* ===== LOADING / ERROR ===== */
+    .state {
+      max-width: 800px;
+      margin: 60px auto;
+      padding: 40px;
+      background: var(--paper);
+      color: var(--ink);
+      text-align: center;
+      border-radius: 8px;
+    }
+    .state h2 { font-size: 18px; margin-bottom: 8px; }
+    .state p { color: var(--ink-dim); margin-bottom: 24px; }
+    .state a { color: #a85a28; }
+
+    /* ===== PRINT ===== */
+    @media print {
+      body { background: white; padding: 0; }
+      .controls { display: none; }
+      .paper {
+        box-shadow: none;
+        max-width: none;
+        padding: 18mm 16mm;
+        min-height: 0;
+      }
+      @page { size: A4; margin: 0; }
+    }
+
+    @media (max-width: 700px) {
+      body { padding: 20px 12px; }
+      .paper { padding: 32px 24px; }
+      .doc-title { font-size: 56px; }
+      .doc-sun { width: 48px; height: 48px; }
+      .parties { grid-template-columns: 1fr; gap: 24px; }
+      .party--right { text-align: left; }
+      .total-bar { margin-left: 0; }
+      .totals-extras { margin-left: 0; }
+      .items thead { display: none; }
+      .items tbody tr { display: block; padding: 14px 0; border-bottom: 1px solid var(--line); }
+      .items tbody td { display: flex; justify-content: space-between; padding: 4px 0; border: none; }
+      .items tbody td:nth-child(2)::before { content: 'Qté · '; font-weight: 600; }
+      .items tbody td:nth-child(3)::before { content: 'Prix · '; font-weight: 600; }
+      .items tbody td:nth-child(4)::before { content: 'Total · '; font-weight: 600; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <h1>Aperçu du devis</h1>
+    <div class="controls__actions">
+      <a class="btn btn-back" href="admin.html">← Retour Admin</a>
+      <button class="btn btn-print" onclick="window.print()">🖨 Imprimer / PDF</button>
+    </div>
+  </div>
+
+  <div id="content"></div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = 'https://bsaswpsgufyamrnrfkvw.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_E-e-dFA7UfXdZgiRL0jr5A_gVtCfjjl';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Coordonnées (modifiables si besoin)
+    const ME = {
+      name: 'MEDOUNE BO',
+      phone: '+221 77-375-83-92',
+      email: 'medounebo0@gmail.com',
+      address: 'Dakar, Sénégal'
+    };
+
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+    function formatCurrency(amount, currency = 'XOF') {
+      const opts = { style: 'currency', currency };
+      if (currency === 'XOF') { opts.minimumFractionDigits = 0; opts.maximumFractionDigits = 0; }
+      try { return new Intl.NumberFormat('fr-FR', opts).format(amount); }
+      catch { return amount + ' ' + currency; }
+    }
+    function formatDateShort(d) {
+      if (!d) return '';
+      const dt = new Date(d);
+      const dd = String(dt.getDate()).padStart(2, '0');
+      const mm = String(dt.getMonth() + 1).padStart(2, '0');
+      const yy = String(dt.getFullYear()).slice(-2);
+      return `${dd}/${mm}/${yy}`;
+    }
+    function getValidityLabel(issueDate, validUntil) {
+      if (!issueDate || !validUntil) return '';
+      const diff = Math.round((new Date(validUntil) - new Date(issueDate)) / 86400000);
+      if (diff === 30) return '1 mois';
+      if (diff === 60) return '2 mois';
+      if (diff === 90) return '3 mois';
+      if (diff === 14) return '2 semaines';
+      if (diff === 7) return '1 semaine';
+      return `${diff} jours`;
+    }
+
+    function renderQuote(q) {
+      const items = Array.isArray(q.items) ? q.items : [];
+      const hasVat = Number(q.vat_rate || 0) > 0;
+      const totalLabel = hasVat ? 'TOTAL TTC' : 'TOTAL HT';
+
+      // Lignes du tableau
+      const itemsRows = items.map(it => `
+        <tr>
+          <td>
+            <div class="item-desc">
+              <div class="item-desc__title">${escapeHtml(it.description || '')}</div>
+              ${it.subtitle ? `<div class="item-desc__sub">${escapeHtml(it.subtitle)}</div>` : ''}
+            </div>
+          </td>
+          <td>${formatCurrency(Number(it.unit_price || 0), q.currency)}</td>
+          <td>${String(Number(it.quantity || 0)).padStart(2, '0')}</td>
+          <td>${formatCurrency(Number(it.quantity || 0) * Number(it.unit_price || 0), q.currency)}</td>
+        </tr>
+      `).join('');
+
+      // Conditions (parser le texte en bullet points)
+      const conditionsList = (q.payment_terms || '')
+        .split('\n')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .map(s => s.replace(/^[-•*]\s*/, ''));
+
+      const validityLabel = getValidityLabel(q.issue_date, q.valid_until);
+
+      document.getElementById('content').innerHTML = `
+        <div class="paper">
+
+          <!-- HEADER -->
+          <div class="doc-head">
+            <div class="doc-head__left">
+              <div class="doc-title">DEVIS</div>
+              <div class="doc-num">Devis n°${escapeHtml(q.quote_number || '—')}</div>
+            </div>
+            <svg class="doc-sun" viewBox="0 0 64 64" aria-label="Logo Baye Dame">
+              <rect width="64" height="64" rx="14" fill="#0a0a0a"/>
+              <text x="32" y="44" font-family="Georgia, 'Times New Roman', serif" font-weight="300" font-style="italic" font-size="32" fill="#f3e3bf" text-anchor="middle">BD</text>
+              <circle cx="50" cy="50" r="3" fill="#c8743a"/>
+            </svg>
+          </div>
+
+          <!-- DATES -->
+          <div class="dates">
+            <div class="date-line"><strong>Date du devis :</strong> ${formatDateShort(q.issue_date)}</div>
+            <div class="date-line"><strong>Validité du devis :</strong> ${validityLabel || formatDateShort(q.valid_until)}</div>
+          </div>
+
+          <!-- PARTIES -->
+          <div class="parties">
+            <div class="party">
+              <h3>${escapeHtml(ME.name)}</h3>
+              <p>${ME.phone}<br/>${ME.email}<br/>${ME.address}</p>
+            </div>
+            <div class="party party--right">
+              <h3>À L'ATTENTION DE</h3>
+              <p>
+                <strong>${escapeHtml(q.client_name)}</strong>
+                ${q.client_phone ? '<br/>' + escapeHtml(q.client_phone) : ''}
+                ${q.client_email ? '<br/>' + escapeHtml(q.client_email) : ''}
+                ${q.client_address ? '<br/>' + escapeHtml(q.client_address) : ''}
+              </p>
+            </div>
+          </div>
+
+          <!-- ITEMS -->
+          <table class="items">
+            <thead>
+              <tr>
+                <th>DESCRIPTION</th>
+                <th>PRIX</th>
+                <th>QUANTITÉ</th>
+                <th>TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>${itemsRows}</tbody>
+          </table>
+
+          <!-- INTER-TOTAUX (si TVA) -->
+          ${hasVat ? `
+            <div class="totals-extras">
+              <div class="totals-extras__row"><span>Sous-total HT</span><span>${formatCurrency(Number(q.subtotal || 0), q.currency)}</span></div>
+              <div class="totals-extras__row"><span>TVA (${q.vat_rate}%)</span><span>${formatCurrency(Number(q.vat_amount || 0), q.currency)}</span></div>
+            </div>
+          ` : ''}
+
+          <!-- BANDEAU TOTAL -->
+          <div class="total-bar">
+            <div class="total-bar__label">${totalLabel} :</div>
+            <div class="total-bar__amount">${formatCurrency(Number(q.total || 0), q.currency)}</div>
+          </div>
+
+          ${!hasVat ? '<div class="vat-mention">TVA non applicable, art. 293B du CGI</div>' : ''}
+
+          <!-- TERMES ET CONDITIONS -->
+          ${conditionsList.length > 0 ? `
+            <div class="terms">
+              <h3>Termes et conditions</h3>
+              <ul>
+                ${conditionsList.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+
+          ${q.notes ? `<div class="notes">${escapeHtml(q.notes)}</div>` : ''}
+
+          <div class="doc-foot">
+            ${escapeHtml(ME.name)} · ${ME.phone} · ${ME.email}
+          </div>
+        </div>
+      `;
+    }
+
+    async function init() {
+      // Check auth
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        document.getElementById('content').innerHTML = `
+          <div class="state">
+            <h2>Connexion requise</h2>
+            <p>Tu dois être connecté à l'admin pour voir ce devis.</p>
+            <a href="admin.html">→ Page de connexion</a>
+          </div>`;
+        return;
+      }
+
+      // Get ID from URL
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (!id) {
+        document.getElementById('content').innerHTML = `
+          <div class="state">
+            <h2>Devis introuvable</h2>
+            <p>L'URL ne contient pas d'identifiant de devis.</p>
+            <a href="admin.html">→ Retour à l'admin</a>
+          </div>`;
+        return;
+      }
+
+      // Fetch quote
+      const { data, error } = await supabase
+        .from('quotes')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error || !data) {
+        document.getElementById('content').innerHTML = `
+          <div class="state">
+            <h2>Erreur de chargement</h2>
+            <p>${escapeHtml(error?.message || 'Devis introuvable')}</p>
+            <a href="admin.html">→ Retour à l'admin</a>
+          </div>`;
+        return;
+      }
+
+      document.title = `Devis ${data.quote_number} — ${data.client_name}`;
+      renderQuote(data);
+    }
+
+    init();
+  </script>
+</body>
+</html>

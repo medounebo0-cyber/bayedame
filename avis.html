@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Votre avis — Baye Dame</title>
+  <meta name="description" content="Laissez votre avis après votre projet avec Baye Dame, vidéaste et photographe à Dakar." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0709;
+      --bg-alt: #1a0e0a;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --fg: #fafafa;
+      --fg-dim: #a8a29e;
+      --accent: #f97316;
+      --accent-2: #fb923c;
+      --accent-3: #c2410c;
+      --accent-soft: rgba(249, 115, 22, 0.12);
+      --line: rgba(255, 255, 255, 0.08);
+      --line-strong: rgba(255, 255, 255, 0.18);
+      --glass-bg: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.10);
+      --glass-shine: rgba(255, 255, 255, 0.18);
+      --star: #fb923c;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    /* Blobs atmosphériques */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 30% 20%, rgba(249, 115, 22, 0.30), transparent 60%),
+        radial-gradient(ellipse 50% 60% at 80% 80%, rgba(194, 65, 12, 0.20), transparent 60%);
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.04) 50%);
+      background-size: 100% 3px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 580px;
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 44px 38px;
+      position: relative;
+      z-index: 2;
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 16px 50px rgba(0, 0, 0, 0.5);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand__logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #0a0a0a;
+      display: grid;
+      place-items: center;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 22px;
+      color: var(--fg);
+      position: relative;
+      border: 1px solid var(--glass-border);
+    }
+    .brand__logo::after {
+      content: '';
+      position: absolute;
+      bottom: 8px; right: 8px;
+      width: 5px; height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .brand__name {
+      font-family: 'Playfair Display', serif;
+      font-weight: 600;
+      font-style: italic;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+    }
+    .brand__name em {
+      font-style: normal;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .brand__tagline {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--fg-dim);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: 36px;
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      margin-bottom: 14px;
+    }
+    h1 em {
+      font-style: italic;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent), var(--accent-3));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .intro {
+      font-size: 14px;
+      color: var(--fg-dim);
+      margin-bottom: 28px;
+      line-height: 1.7;
+    }
+
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--fg-dim);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 13px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 14px;
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      backdrop-filter: blur(20px);
+    }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .field textarea { resize: vertical; min-height: 100px; }
+    .field-hint {
+      font-size: 12px;
+      color: var(--fg-dim);
+      margin-top: 4px;
+    }
+
+    /* ===== STARS ===== */
+    .stars {
+      display: flex;
+      gap: 8px;
+      padding: 6px 0;
+    }
+    .star {
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      color: var(--line-strong);
+    }
+    .star:hover { transform: scale(1.15); }
+    .star.is-active { color: var(--star); }
+    .stars-feedback {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-top: 8px;
+      min-height: 16px;
+    }
+
+    /* ===== SUBMIT ===== */
+    .submit-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent), var(--accent-3));
+      color: var(--bg);
+      border: none;
+      border-radius: 100px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      margin-top: 8px;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 8px 24px rgba(249, 115, 22, 0.35);
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 14px 32px rgba(249, 115, 22, 0.55);
+    }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .footer {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      color: var(--fg-dim);
+      letter-spacing: 0.05em;
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    /* ===== HONEYPOT ===== */
+    .honey {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ===== STATES ===== */
+    .alert {
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      text-align: center;
+      margin-top: 16px;
+      display: none;
+    }
+    .alert.is-visible { display: block; }
+    .alert-success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid #10b981;
+      color: #10b981;
+    }
+    .alert-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid #ef4444;
+      color: #ef4444;
+    }
+
+    .thanks {
+      text-align: center;
+      padding: 30px 0;
+      display: none;
+    }
+    .thanks.is-visible { display: block; }
+    .thanks-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      font-size: 36px;
+    }
+    .thanks h2 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: 32px;
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+    }
+    .thanks h2 em {
+      font-style: italic;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .thanks p { color: var(--fg-dim); margin-bottom: 24px; line-height: 1.7; }
+    .thanks a {
+      display: inline-block;
+      padding: 13px 26px;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      color: var(--bg);
+      border-radius: 100px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 8px 22px rgba(249, 115, 22, 0.4);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .thanks a:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 12px 28px rgba(249, 115, 22, 0.55);
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 16px; }
+      .card { padding: 28px 22px; }
+      h1 { font-size: 26px; }
+      .star { width: 34px; height: 34px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="brand">
+      <div class="brand__logo">BD</div>
+      <div>
+        <div class="brand__name">Baye <em>Dame</em></div>
+        <div class="brand__tagline">Vidéaste · Photographe</div>
+      </div>
+    </div>
+
+    <!-- FORMULAIRE -->
+    <div id="form-wrap">
+      <h1>Votre <em>avis</em> compte.</h1>
+      <p class="intro">
+        Merci d'avoir choisi de travailler avec moi. Quelques mots de votre part comptent énormément pour ma visibilité et pour rassurer mes futurs clients. Ça prend moins d'1 minute.
+      </p>
+
+      <form id="avis-form" autocomplete="off">
+
+        <!-- Honeypot anti-spam -->
+        <div class="honey">
+          <label>Ne pas remplir : <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <div class="field">
+          <label for="f-name">Votre nom *</label>
+          <input id="f-name" name="name" required maxlength="100" placeholder="Aïssatou Diop" />
+        </div>
+
+        <div class="field">
+          <label for="f-role">Vous êtes... (optionnel)</label>
+          <input id="f-role" name="role" maxlength="200" placeholder="Mariée à Saly · Artiste · Chef d'entreprise · ..." />
+          <div class="field-hint">Quelques mots pour contextualiser pour mes futurs clients.</div>
+        </div>
+
+        <div class="field">
+          <label for="f-project">Type de projet (optionnel)</label>
+          <select id="f-project" name="project_type">
+            <option value="">— Choisir —</option>
+            <option>Mariage</option>
+            <option>Clip</option>
+            <option>Making-Of</option>
+            <option>Concert</option>
+            <option>Documentaire</option>
+            <option>Corporate</option>
+            <option>Publicité</option>
+            <option>Reportage / Événementiel</option>
+            <option>Photographie</option>
+            <option>Autre</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Votre note *</label>
+          <div class="stars" id="stars" role="radiogroup" aria-label="Note sur 5">
+            <svg class="star" viewBox="0 0 24 24" data-rate="1" role="radio" tabindex="0" aria-label="1 étoile" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <svg class="star" viewBox="0 0 24 24" data-rate="2" role="radio" tabindex="0" aria-label="2 étoiles" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <svg class="star" viewBox="0 0 24 24" data-rate="3" role="radio" tabindex="0" aria-label="3 étoiles" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <svg class="star" viewBox="0 0 24 24" data-rate="4" role="radio" tabindex="0" aria-label="4 étoiles" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <svg class="star" viewBox="0 0 24 24" data-rate="5" role="radio" tabindex="0" aria-label="5 étoiles" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <div class="stars-feedback" id="stars-feedback">Cliquez pour noter</div>
+          <input type="hidden" id="f-rating" name="rating" value="" required />
+        </div>
+
+        <div class="field">
+          <label for="f-message">Votre témoignage *</label>
+          <textarea id="f-message" name="message" required minlength="10" maxlength="2000" placeholder="Racontez en quelques mots votre expérience, ce qui vous a plu, le résultat..."></textarea>
+          <div class="field-hint"><span id="char-count">0</span> / 2000 caractères</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">Envoyer mon avis</button>
+
+        <div class="alert alert-error" id="error-msg">
+          Une erreur est survenue. Réessayez ou écrivez-moi directement à medounebo0@gmail.com
+        </div>
+      </form>
+    </div>
+
+    <!-- ECRAN DE MERCI -->
+    <div class="thanks" id="thanks">
+      <div class="thanks-icon">✓</div>
+      <h2>Merci <em id="thanks-name"></em> !</h2>
+      <p>
+        Votre avis a bien été envoyé. Je vais le relire et il apparaîtra sur mon portfolio sous peu.<br/>
+        Au plaisir de retravailler ensemble.
+      </p>
+      <a href="index.html">← Voir mon portfolio</a>
+    </div>
+
+    <div class="footer">
+      Baye Dame · Vidéaste &amp; Photographe · Dakar<br/>
+      <a href="index.html">bayedame.netlify.app</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = 'https://bsaswpsgufyamrnrfkvw.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_E-e-dFA7UfXdZgiRL0jr5A_gVtCfjjl';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const $ = id => document.getElementById(id);
+
+    // Pré-remplissage depuis les query params (ex: ?nom=Aissatou&projet=Mariage)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('nom')) $('f-name').value = params.get('nom');
+    if (params.get('role')) $('f-role').value = params.get('role');
+    const projet = params.get('projet');
+    if (projet) {
+      const opt = Array.from($('f-project').options).find(o => o.text.toLowerCase().includes(projet.toLowerCase()));
+      if (opt) $('f-project').value = opt.value;
+    }
+
+    // ===== ÉTOILES =====
+    const RATING_LABELS = {
+      1: 'Très déçu',
+      2: 'Bof',
+      3: 'Correct',
+      4: 'Très bien',
+      5: 'Excellent !'
+    };
+    let currentRating = 0;
+    const stars = $('stars').querySelectorAll('.star');
+    function paintStars(rating) {
+      stars.forEach(s => {
+        const n = parseInt(s.dataset.rate);
+        s.classList.toggle('is-active', n <= rating);
+      });
+    }
+    stars.forEach(s => {
+      const n = parseInt(s.dataset.rate);
+      s.addEventListener('mouseenter', () => paintStars(n));
+      s.addEventListener('mouseleave', () => paintStars(currentRating));
+      s.addEventListener('click', () => {
+        currentRating = n;
+        $('f-rating').value = n;
+        paintStars(n);
+        $('stars-feedback').textContent = RATING_LABELS[n];
+      });
+      s.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); s.click(); }
+      });
+    });
+
+    // ===== COMPTEUR CARACTÈRES =====
+    $('f-message').addEventListener('input', () => {
+      $('char-count').textContent = $('f-message').value.length;
+    });
+
+    // ===== ENVOI =====
+    $('avis-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const honey = document.querySelector('.honey input').value;
+      if (honey) return; // bot détecté
+      if (currentRating === 0) {
+        $('error-msg').textContent = 'Merci de cliquer sur les étoiles pour donner une note.';
+        $('error-msg').classList.add('is-visible');
+        return;
+      }
+      $('error-msg').classList.remove('is-visible');
+      const btn = $('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Envoi…';
+
+      const payload = {
+        client_name: $('f-name').value.trim(),
+        client_role: $('f-role').value.trim() || null,
+        project_type: $('f-project').value || null,
+        rating: currentRating,
+        message: $('f-message').value.trim(),
+        // status par défaut = 'pending' côté DB
+      };
+
+      const { error } = await supabase
+        .from('testimonials')
+        .insert(payload);
+
+      if (error) {
+        btn.disabled = false;
+        btn.textContent = 'Envoyer mon avis';
+        $('error-msg').textContent = 'Erreur : ' + (error.message || 'Réessayez plus tard.');
+        $('error-msg').classList.add('is-visible');
+        return;
+      }
+
+      $('thanks-name').textContent = payload.client_name;
+      $('form-wrap').style.display = 'none';
+      $('thanks').classList.add('is-visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+  <script src="analytics.js" defer></script>
+</body>
+</html>

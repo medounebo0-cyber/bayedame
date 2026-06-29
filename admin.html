@@ -1,0 +1,3179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin — Baye Dame</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0709;
+      --bg-alt: #1a0e0a;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --fg: #fafafa;
+      --fg-dim: #a8a29e;
+      --accent: #f97316;
+      --accent-2: #fb923c;
+      --accent-3: #c2410c;
+      --accent-soft: rgba(249, 115, 22, 0.12);
+      --line: rgba(255, 255, 255, 0.08);
+      --line-strong: rgba(255, 255, 255, 0.18);
+      --glass-bg: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.10);
+      --glass-shine: rgba(255, 255, 255, 0.18);
+
+      --st-new: #6366f1;
+      --st-callback: #f59e0b;
+      --st-quoted: #a855f7;
+      --st-converted: #10b981;
+      --st-lost: #6b7280;
+
+      --q-draft: #6b7280;
+      --q-sent: #6366f1;
+      --q-accepted: #10b981;
+      --q-refused: #ef4444;
+      --q-expired: #f59e0b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    /* Blobs atmosphériques discrets pour l'admin */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 10% 0%, rgba(249, 115, 22, 0.14), transparent 60%),
+        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(99, 102, 241, 0.08), transparent 60%);
+    }
+    .topbar, .stats, .view, .login-wrap, .modal { position: relative; z-index: 2; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button { font-family: inherit; cursor: pointer; }
+
+    /* ========== HEADER ========== */
+    .topbar {
+      margin: 14px;
+      padding: 14px 26px;
+      border-radius: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    .topbar__brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .topbar__brand strong {
+      font-family: 'Playfair Display', serif;
+      font-weight: 600;
+      font-style: italic;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+    .topbar__brand span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--bg);
+      padding: 4px 12px;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      border-radius: 100px;
+      font-weight: 600;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 8px rgba(249,115,22,0.3);
+    }
+    .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+    .tab {
+      padding: 8px 16px;
+      background: transparent;
+      color: var(--fg-dim);
+      border: 1px solid transparent;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .tab:hover { color: var(--fg); background: rgba(255, 255, 255, 0.04); }
+    .tab.is-active {
+      background: rgba(249, 115, 22, 0.12);
+      color: var(--accent-2);
+      border-color: rgba(249, 115, 22, 0.30);
+    }
+    .topbar__right { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--fg-dim); }
+    .btn-logout {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--fg);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      font-size: 13px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-logout:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--line-strong); }
+
+    /* ========== LOGIN ========== */
+    .login-wrap {
+      min-height: calc(100vh - 70px);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+    .login {
+      width: 100%;
+      max-width: 420px;
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 44px;
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 16px 50px rgba(0, 0, 0, 0.5);
+    }
+    .login h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .login p {
+      color: var(--fg-dim);
+      margin-bottom: 28px;
+      font-size: 13px;
+    }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--fg-dim);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 14px;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.05); }
+    .field textarea { resize: vertical; min-height: 80px; }
+    .field select { cursor: pointer; }
+    .field select option { background: var(--bg-alt); color: var(--fg); }
+    .btn-primary {
+      padding: 11px 22px;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent), var(--accent-3));
+      color: var(--bg);
+      border: none;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 4px 14px rgba(249, 115, 22, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 10px 24px rgba(249, 115, 22, 0.5);
+    }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-primary--full { width: 100%; }
+    .btn-secondary {
+      padding: 11px 20px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--fg);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--line-strong); }
+    .login-error {
+      margin-top: 16px;
+      padding: 10px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-radius: 6px;
+      font-size: 13px;
+      text-align: center;
+      display: none;
+    }
+    .login-error.is-visible { display: block; }
+
+    /* ========== STATS ========== */
+    .stats {
+      padding: 20px 32px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+    }
+    .stat {
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 16px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 4px 18px rgba(0, 0, 0, 0.25);
+    }
+    .stat:hover {
+      border-color: rgba(249, 115, 22, 0.30);
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 10px 28px rgba(249, 115, 22, 0.15);
+    }
+    .stat.is-active {
+      border-color: var(--accent);
+      background: rgba(249, 115, 22, 0.08);
+    }
+    .stat__label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      margin-bottom: 8px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stat__value {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+    }
+    .stat__dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    /* ========== TOOLBAR + LISTS ========== */
+    .toolbar {
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .toolbar h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+    .toolbar__count { color: var(--fg-dim); font-size: 13px; }
+    .toolbar__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .refresh-btn {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--fg);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      font-size: 13px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .refresh-btn:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--line-strong); }
+    .new-btn {
+      padding: 9px 20px;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent), var(--accent-3));
+      color: var(--bg);
+      border: none;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 4px 14px rgba(249, 115, 22, 0.3);
+    }
+    .new-btn:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 10px 24px rgba(249, 115, 22, 0.5);
+    }
+
+    .list {
+      padding: 0 32px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--fg-dim);
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--fg-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+    }
+    .hidden { display: none !important; }
+
+    /* ========== MESSAGE CARD ========== */
+    .msg {
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 22px;
+      transition: all 0.3s ease;
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 6px 22px rgba(0, 0, 0, 0.25);
+    }
+    .msg:hover {
+      border-color: rgba(249, 115, 22, 0.25);
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 12px 30px rgba(249, 115, 22, 0.12);
+    }
+    .msg__head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .msg__meta { display: flex; flex-direction: column; gap: 4px; }
+    .msg__name { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    .msg__contact {
+      display: flex; gap: 16px;
+      font-size: 13px; color: var(--fg-dim);
+      flex-wrap: wrap; align-items: center;
+    }
+    .msg__contact a { color: var(--fg-dim); }
+    .msg__contact a:hover { color: var(--accent); }
+    .msg__date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; letter-spacing: 0.1em;
+      color: var(--fg-dim);
+      white-space: nowrap;
+    }
+    .msg__type {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(249, 115, 22, 0.10);
+      border: 1px solid rgba(249, 115, 22, 0.25);
+      border-radius: 100px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--accent-2);
+      margin-bottom: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+    }
+    .msg__body {
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      color: var(--fg);
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      margin-bottom: 16px;
+    }
+    .msg__actions {
+      display: flex; gap: 8px;
+      align-items: center; flex-wrap: wrap;
+    }
+    .msg__status, .quote__status {
+      padding: 7px 14px;
+      border-radius: 100px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .msg__status:hover, .quote__status:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--line-strong); }
+    .msg__delete, .quote__delete {
+      padding: 7px 14px;
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      color: var(--fg-dim);
+      font-size: 13px;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .msg__delete:hover, .quote__delete:hover { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.06); }
+    .msg__create-quote {
+      padding: 7px 16px;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      color: var(--bg);
+      border: none;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 4px 12px rgba(249, 115, 22, 0.3);
+    }
+    .msg__create-quote:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 8px 20px rgba(249, 115, 22, 0.5);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .pill .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; }
+    .st-new { color: var(--st-new); background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99,102,241,0.25); }
+    .st-callback { color: var(--st-callback); background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245,158,11,0.25); }
+    .st-quoted { color: var(--st-quoted); background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168,85,247,0.25); }
+    .st-converted { color: var(--st-converted); background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16,185,129,0.25); }
+    .st-lost { color: var(--st-lost); background: rgba(107, 114, 128, 0.12); border: 1px solid rgba(107,114,128,0.25); }
+    .dot-new { background: var(--st-new); }
+    .dot-callback { background: var(--st-callback); }
+    .dot-quoted { background: var(--st-quoted); }
+    .dot-converted { background: var(--st-converted); }
+    .dot-lost { background: var(--st-lost); }
+    .q-draft { color: var(--q-draft); background: rgba(107, 114, 128, 0.12); border: 1px solid rgba(107,114,128,0.25); }
+    .q-sent { color: var(--q-sent); background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99,102,241,0.25); }
+    .q-accepted { color: var(--q-accepted); background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16,185,129,0.25); }
+    .q-refused { color: var(--q-refused); background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239,68,68,0.25); }
+    .q-expired { color: var(--q-expired); background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245,158,11,0.25); }
+    .qdot-draft { background: var(--q-draft); }
+    .qdot-sent { background: var(--q-sent); }
+    .qdot-accepted { background: var(--q-accepted); }
+    .qdot-refused { background: var(--q-refused); }
+    .qdot-expired { background: var(--q-expired); }
+
+    /* ========== QUOTE CARD ========== */
+    .quote {
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 22px;
+      transition: all 0.3s ease;
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 6px 22px rgba(0, 0, 0, 0.25);
+    }
+    .quote:hover {
+      border-color: rgba(249, 115, 22, 0.25);
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 12px 30px rgba(249, 115, 22, 0.12);
+    }
+    .quote__head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .quote__num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      color: var(--accent-2);
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+    .quote__client {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    .quote__amount {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      white-space: nowrap;
+    }
+    .quote__sub {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      font-size: 13px; color: var(--fg-dim);
+      margin-bottom: 12px;
+    }
+    .quote__items-preview {
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--fg-dim);
+      margin-bottom: 12px;
+    }
+    .quote__actions {
+      display: flex; gap: 8px;
+      align-items: center; flex-wrap: wrap;
+    }
+    .quote__view-btn, .quote__edit-btn {
+      padding: 7px 16px;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      color: var(--bg);
+      border: none;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.3s;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 4px 12px rgba(249, 115, 22, 0.3);
+    }
+    .quote__view-btn:hover, .quote__edit-btn:hover {
+      text-decoration: none;
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 8px 20px rgba(249, 115, 22, 0.5);
+    }
+    .quote__edit-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border);
+      color: var(--fg);
+      box-shadow: none;
+    }
+    .quote__edit-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--line-strong);
+      box-shadow: none;
+    }
+
+    /* ========== MODAL ========== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 20px;
+      overflow-y: auto;
+    }
+    .modal-backdrop.is-visible { display: flex; }
+    .modal {
+      backdrop-filter: blur(40px) saturate(200%);
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      background: rgba(20, 12, 8, 0.85);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 880px;
+      padding: 32px 36px;
+      position: relative;
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 24px 60px rgba(0, 0, 0, 0.6);
+    }
+    .modal__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .modal__title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+    .modal__close {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border);
+      color: var(--fg);
+      font-size: 20px;
+      display: grid;
+      place-items: center;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .modal__close:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--line-strong); }
+    .modal__section {
+      margin-bottom: 24px;
+    }
+    .modal__section-title {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    /* ========== ITEMS LINES ========== */
+    .items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .item-card {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.2s;
+    }
+    .item-card:focus-within { border-color: var(--accent); }
+    .item-card input {
+      padding: 9px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 13px;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      width: 100%;
+    }
+    .item-card input:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.05); }
+    .item-card input.title {
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .item-card input.subtitle {
+      font-size: 12px;
+      color: var(--fg-dim);
+      font-style: italic;
+    }
+    .item-card__num {
+      display: grid;
+      grid-template-columns: 80px 1fr 1fr 36px;
+      gap: 8px;
+      align-items: center;
+    }
+    .item-card__num-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--fg-dim);
+      text-transform: uppercase;
+      padding: 0 6px;
+    }
+    .item-row__total {
+      padding: 9px 12px;
+      background: rgba(249, 115, 22, 0.10);
+      border: 1px solid rgba(249, 115, 22, 0.20);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--accent-2);
+      font-weight: 600;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .item-row__del {
+      width: 36px; height: 36px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border);
+      color: var(--fg-dim);
+      border-radius: 8px;
+      font-size: 16px;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+      flex-shrink: 0;
+    }
+    .item-row__del:hover { color: #ef4444; border-color: #ef4444; background: rgba(239,68,68,0.08); }
+    .add-item-btn {
+      padding: 12px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed var(--glass-border);
+      color: var(--fg-dim);
+      border-radius: 10px;
+      font-size: 13px;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .add-item-btn:hover { background: rgba(249, 115, 22, 0.06); color: var(--accent-2); border-color: var(--accent); }
+    @media (max-width: 700px) {
+      .item-card__num { grid-template-columns: 1fr; gap: 6px; }
+    }
+
+    /* ========== TOTALS ========== */
+    .totals {
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .totals__row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+    .totals__row span:first-child { color: var(--fg-dim); }
+    .totals__row span:last-child { font-variant-numeric: tabular-nums; font-weight: 500; }
+    .totals__row--total {
+      padding-top: 12px;
+      margin-top: 6px;
+      border-top: 1px solid var(--line);
+      font-size: 18px;
+    }
+    .totals__row--total span:last-child {
+      font-family: 'Playfair Display', serif;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-size: 26px;
+      font-weight: 500;
+    }
+
+    /* ========== MODAL FOOTER ========== */
+    .modal__foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+    .modal__foot-left, .modal__foot-right { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 700px) {
+      .topbar { padding: 12px 20px; gap: 12px; }
+      .tabs { width: 100%; }
+      .stats { padding: 16px 20px; grid-template-columns: repeat(2, 1fr); }
+      .toolbar { padding: 16px 20px; }
+      .list { padding: 0 20px 24px; }
+      .login { padding: 28px 24px; }
+      .modal { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="login-screen" class="login-wrap">
+    <div class="login">
+      <h1>Admin — Baye Dame</h1>
+      <p>Connecte-toi pour gérer tes messages et devis.</p>
+      <form id="login-form">
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input id="login-email" type="email" required autocomplete="email" placeholder="medounebo0@gmail.com" />
+        </div>
+        <div class="field">
+          <label for="login-pwd">Mot de passe</label>
+          <input id="login-pwd" type="password" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn-primary btn-primary--full" id="login-btn">Se connecter</button>
+        <div class="login-error" id="login-error">Email ou mot de passe incorrect.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="hidden">
+    <div class="topbar">
+      <div class="topbar__brand">
+        <strong>Baye Dame</strong>
+        <span>ADMIN</span>
+      </div>
+      <div class="tabs">
+        <button class="tab is-active" data-tab="dashboard">📈 Dashboard</button>
+        <button class="tab" data-tab="messages">📥 Messages</button>
+        <button class="tab" data-tab="quotes">📄 Devis</button>
+        <button class="tab" data-tab="invoices">💰 Factures</button>
+        <button class="tab" data-tab="testimonials">⭐ Avis</button>
+        <button class="tab" data-tab="projects">🎬 Projets</button>
+        <button class="tab" data-tab="stats">📊 Stats</button>
+        <button class="tab" data-tab="settings">⚙️ Réglages</button>
+      </div>
+      <div class="topbar__right">
+        <a href="index.html" target="_blank">Voir le site ↗</a>
+        <button class="btn-logout" id="logout-btn">Déconnexion</button>
+      </div>
+    </div>
+
+    <!-- TAB DASHBOARD -->
+    <div id="tab-dashboard" class="tab-content">
+      <div class="toolbar">
+        <div>
+          <h2>Vue d'ensemble</h2>
+          <span class="toolbar__count" id="dashboard-greeting">Ton business en un coup d'œil</span>
+        </div>
+        <div class="toolbar__actions">
+          <button class="refresh-btn" id="refresh-dashboard">↻ Actualiser</button>
+        </div>
+      </div>
+
+      <!-- KPIs principaux -->
+      <div class="stats" id="dashboard-kpis" style="padding: 0 32px 24px; border: none;"></div>
+
+      <!-- Alertes -->
+      <div id="dashboard-alerts" style="padding: 0 32px;"></div>
+
+      <!-- Chart CA mensuel -->
+      <div class="list" style="padding: 0 32px 16px; gap: 20px;">
+        <div class="msg" style="padding: 24px;">
+          <h3 style="font-size: 13px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 18px; font-weight: 600;">
+            💰 Chiffre d'affaires encaissé · 12 derniers mois
+          </h3>
+          <div id="ca-chart" style="display: flex; align-items: flex-end; gap: 6px; height: 200px; padding: 0 4px;"></div>
+          <div id="ca-chart-empty" class="empty hidden" style="padding: 30px;">Aucun paiement reçu pour l'instant.</div>
+        </div>
+
+        <!-- Top clients + Pipeline -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="msg" style="padding: 20px;">
+            <h3 style="font-size: 12px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 14px; font-weight: 600;">
+              🏆 Top clients
+            </h3>
+            <div id="top-clients"></div>
+          </div>
+          <div class="msg" style="padding: 20px;">
+            <h3 style="font-size: 12px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 14px; font-weight: 600;">
+              🎯 Pipeline (devis envoyés)
+            </h3>
+            <div id="pipeline"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB MESSAGES -->
+    <div id="tab-messages" class="tab-content hidden">
+      <div class="stats" id="stats-messages"></div>
+      <div class="toolbar">
+        <div>
+          <h2>Messages</h2>
+          <span class="toolbar__count" id="msg-count"></span>
+        </div>
+        <div class="toolbar__actions">
+          <button class="refresh-btn" id="refresh-messages">↻ Actualiser</button>
+        </div>
+      </div>
+      <div class="list" id="messages-list">
+        <div class="loading">CHARGEMENT…</div>
+      </div>
+    </div>
+
+    <!-- TAB QUOTES -->
+    <div id="tab-quotes" class="tab-content hidden">
+      <div class="stats" id="stats-quotes"></div>
+      <div class="toolbar">
+        <div>
+          <h2>Devis</h2>
+          <span class="toolbar__count" id="quote-count"></span>
+        </div>
+        <div class="toolbar__actions">
+          <button class="refresh-btn" id="refresh-quotes">↻ Actualiser</button>
+          <button class="new-btn" id="new-quote-btn">+ Nouveau devis</button>
+        </div>
+      </div>
+      <div class="list" id="quotes-list">
+        <div class="loading">CHARGEMENT…</div>
+      </div>
+    </div>
+  </div>
+
+    <!-- TAB SETTINGS -->
+    <div id="tab-settings" class="tab-content hidden">
+      <div class="toolbar">
+        <div>
+          <h2>Réglages</h2>
+          <span class="toolbar__count">Configuration des notifications Telegram</span>
+        </div>
+      </div>
+      <div class="list">
+        <div class="msg" style="padding: 28px;">
+          <h3 style="font-size: 13px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 18px; font-weight: 600;">
+            🔔 Notifications Telegram
+          </h3>
+          <p style="color: var(--fg-dim); font-size: 13px; margin-bottom: 24px; line-height: 1.7;">
+            Reçois une notif sur ton téléphone à chaque message client, témoignage, retour sur un projet,
+            ou devis accepté/refusé. <strong>100% gratuit et instantané</strong>.
+          </p>
+
+          <div id="settings-loading" class="loading">CHARGEMENT…</div>
+
+          <form id="settings-form" class="hidden">
+            <div class="grid-2">
+              <div class="field">
+                <label for="telegram-token">Bot Token (depuis @BotFather)</label>
+                <input id="telegram-token" type="text" placeholder="123456:ABC-def..." spellcheck="false" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="telegram-chat-id">Chat ID (depuis @userinfobot)</label>
+                <input id="telegram-chat-id" type="text" placeholder="123456789" spellcheck="false" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="notif-enabled" style="width: 18px; height: 18px; accent-color: var(--accent);" />
+                <span style="color: var(--fg); text-transform: none; letter-spacing: 0; font-size: 14px;">
+                  <strong>Activer les notifications</strong>
+                </span>
+              </label>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line);">
+              <div style="font-size: 11px; letter-spacing: 0.15em; color: var(--fg-dim); margin-bottom: 14px; text-transform: uppercase; font-weight: 500;">
+                Types d'événements à notifier
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                  <input type="checkbox" id="notif-contact" style="width: 18px; height: 18px; accent-color: var(--accent);" />
+                  <span>📥 Nouveau message de contact (formulaire)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                  <input type="checkbox" id="notif-testimonial" style="width: 18px; height: 18px; accent-color: var(--accent);" />
+                  <span>⭐ Nouveau témoignage à modérer</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                  <input type="checkbox" id="notif-comment" style="width: 18px; height: 18px; accent-color: var(--accent);" />
+                  <span>💬 Retour client sur un projet</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                  <input type="checkbox" id="notif-quote" style="width: 18px; height: 18px; accent-color: var(--accent);" />
+                  <span>📄 Devis accepté ou refusé</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="modal__foot" style="border-top: 1px solid var(--line); padding-top: 20px; margin-top: 24px;">
+              <div class="modal__foot-left">
+                <button type="button" class="btn-secondary" id="settings-test">📤 Envoyer un test</button>
+              </div>
+              <div class="modal__foot-right">
+                <button type="submit" class="btn-primary" id="settings-save">💾 Sauvegarder</button>
+              </div>
+            </div>
+
+            <div id="settings-msg" style="margin-top: 16px; padding: 12px; border-radius: 6px; font-size: 13px; text-align: center; display: none;"></div>
+          </form>
+
+          <details style="margin-top: 28px; padding: 16px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
+            <summary style="cursor: pointer; font-weight: 500; color: var(--accent);">📖 Comment obtenir le Bot Token et Chat ID ?</summary>
+            <div style="margin-top: 16px; color: var(--fg-dim); font-size: 13px; line-height: 1.8;">
+              <p><strong style="color: var(--fg);">1. Bot Token</strong></p>
+              <ul style="padding-left: 24px; margin-bottom: 16px;">
+                <li>Dans Telegram, cherche <code style="background: var(--bg-card); padding: 2px 6px; border-radius: 3px; color: var(--accent);">@BotFather</code></li>
+                <li>Tape <code style="background: var(--bg-card); padding: 2px 6px; border-radius: 3px; color: var(--accent);">/newbot</code></li>
+                <li>Donne un nom (ex: <em>Baye Dame Notifs</em>) et un username (ex: <em>bayedame_notifs_bot</em>)</li>
+                <li>BotFather te donne un token comme <code style="background: var(--bg-card); padding: 2px 6px; border-radius: 3px; color: var(--accent);">123456:ABC-def...</code></li>
+              </ul>
+              <p><strong style="color: var(--fg);">2. Chat ID</strong></p>
+              <ul style="padding-left: 24px; margin-bottom: 16px;">
+                <li>Dans Telegram, cherche <code style="background: var(--bg-card); padding: 2px 6px; border-radius: 3px; color: var(--accent);">@userinfobot</code></li>
+                <li>Clique « Démarrer » → il t'affiche ton <code style="background: var(--bg-card); padding: 2px 6px; border-radius: 3px; color: var(--accent);">Id</code></li>
+              </ul>
+              <p><strong style="color: var(--fg);">3. Activer ton bot</strong></p>
+              <ul style="padding-left: 24px;">
+                <li>Cherche le bot que tu viens de créer (par son username)</li>
+                <li>Clique « Démarrer » pour autoriser les messages</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB INVOICES -->
+    <div id="tab-invoices" class="tab-content hidden">
+      <div class="stats" id="stats-invoices"></div>
+      <div class="toolbar">
+        <div>
+          <h2>Factures</h2>
+          <span class="toolbar__count" id="invoice-count"></span>
+        </div>
+        <div class="toolbar__actions">
+          <button class="refresh-btn" id="refresh-invoices">↻ Actualiser</button>
+        </div>
+      </div>
+      <div class="list" id="invoices-list">
+        <div class="loading">CHARGEMENT…</div>
+      </div>
+    </div>
+
+  <!-- MODAL : Enregistrer un paiement -->
+  <div class="modal-backdrop" id="payment-modal">
+    <div class="modal" style="max-width: 520px;">
+      <div class="modal__head">
+        <div class="modal__title">💵 Enregistrer un paiement</div>
+        <button class="modal__close" id="payment-modal-close" aria-label="Fermer">✕</button>
+      </div>
+      <form id="payment-form">
+        <input type="hidden" id="pay-invoice-id" />
+        <div id="pay-context" style="background: var(--bg); padding: 14px; border-radius: 8px; margin-bottom: 18px; font-size: 13px; color: var(--fg-dim); line-height: 1.6;"></div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="pay-amount">Montant reçu *</label>
+            <input id="pay-amount" type="number" min="1" step="1" required placeholder="200000" />
+          </div>
+          <div class="field">
+            <label for="pay-method">Méthode *</label>
+            <select id="pay-method" required>
+              <option value="wave">💙 Wave</option>
+              <option value="orange_money">🟠 Orange Money</option>
+              <option value="cash">💵 Espèces</option>
+              <option value="virement">🏦 Virement bancaire</option>
+              <option value="cheque">📝 Chèque</option>
+              <option value="autre">❓ Autre</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pay-date">Date reçue *</label>
+            <input id="pay-date" type="date" required />
+          </div>
+          <div class="field">
+            <label for="pay-reference">Référence (optionnel)</label>
+            <input id="pay-reference" maxlength="200" placeholder="N° transaction Wave/OM" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="pay-notes">Notes (optionnel)</label>
+          <textarea id="pay-notes" rows="2" placeholder="Ex : acompte versé en main propre lors de la signature."></textarea>
+        </div>
+        <div class="modal__foot">
+          <div class="modal__foot-left">
+            <button type="button" class="btn-secondary" id="payment-cancel">Annuler</button>
+          </div>
+          <div class="modal__foot-right">
+            <button type="submit" class="btn-primary">💾 Enregistrer le paiement</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    <!-- TAB STATS -->
+    <div id="tab-stats" class="tab-content hidden">
+      <div class="stats" id="stats-kpis"></div>
+      <div class="toolbar">
+        <div>
+          <h2>Trafic du site</h2>
+          <span class="toolbar__count" id="stats-range">30 derniers jours</span>
+        </div>
+        <div class="toolbar__actions">
+          <select id="stats-period" class="refresh-btn" style="padding: 7px 14px;">
+            <option value="7">7 derniers jours</option>
+            <option value="30" selected>30 derniers jours</option>
+            <option value="90">90 derniers jours</option>
+            <option value="365">12 derniers mois</option>
+          </select>
+          <button class="refresh-btn" id="refresh-stats">↻ Actualiser</button>
+        </div>
+      </div>
+      <div class="list" style="gap: 20px;">
+        <!-- CHART : Vues par jour -->
+        <div class="msg" style="padding: 24px;">
+          <h3 style="font-size: 13px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 18px; font-weight: 600;">📈 Visites par jour</h3>
+          <div id="chart-views" style="display: flex; align-items: flex-end; gap: 3px; height: 200px; overflow-x: auto; padding-bottom: 8px;"></div>
+          <div id="chart-empty" class="empty hidden" style="padding: 30px;">Aucune visite enregistrée sur cette période.</div>
+        </div>
+
+        <!-- GRID : Top pages + Top sources + Pays + Devices -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          <div class="msg" style="padding: 20px;">
+            <h3 style="font-size: 12px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 14px; font-weight: 600;">🔝 Top pages</h3>
+            <div id="top-pages"></div>
+          </div>
+          <div class="msg" style="padding: 20px;">
+            <h3 style="font-size: 12px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 14px; font-weight: 600;">🔗 Sources de trafic</h3>
+            <div id="top-sources"></div>
+          </div>
+          <div class="msg" style="padding: 20px;">
+            <h3 style="font-size: 12px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 14px; font-weight: 600;">🌍 Pays</h3>
+            <div id="top-countries"></div>
+          </div>
+          <div class="msg" style="padding: 20px;">
+            <h3 style="font-size: 12px; letter-spacing: 0.15em; color: var(--accent); text-transform: uppercase; margin-bottom: 14px; font-weight: 600;">📱 Appareils</h3>
+            <div id="top-devices"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB PROJECTS -->
+    <div id="tab-projects" class="tab-content hidden">
+      <div class="stats" id="stats-projects"></div>
+      <div class="toolbar">
+        <div>
+          <h2>Espaces clients</h2>
+          <span class="toolbar__count" id="project-count"></span>
+        </div>
+        <div class="toolbar__actions">
+          <button class="refresh-btn" id="refresh-projects">↻ Actualiser</button>
+          <button class="new-btn" id="new-project-btn">+ Nouveau projet</button>
+        </div>
+      </div>
+      <div class="list" id="projects-list">
+        <div class="loading">CHARGEMENT…</div>
+      </div>
+    </div>
+
+  <!-- MODAL : Création de projet client -->
+  <div class="modal-backdrop" id="project-modal">
+    <div class="modal" style="max-width: 560px;">
+      <div class="modal__head">
+        <div class="modal__title">🎬 Nouveau projet client</div>
+        <button class="modal__close" id="project-modal-close" aria-label="Fermer">✕</button>
+      </div>
+      <form id="project-form">
+        <input type="hidden" id="p-id" />
+        <div class="field">
+          <label for="p-title">Titre du projet *</label>
+          <input id="p-title" required maxlength="200" placeholder="Mariage Aïssatou & Mamadou — Saly" />
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="p-client">Client *</label>
+            <input id="p-client" required maxlength="200" placeholder="Aïssatou Diop" />
+          </div>
+          <div class="field">
+            <label for="p-email">Email client</label>
+            <input id="p-email" type="email" placeholder="client@exemple.com" />
+          </div>
+          <div class="field">
+            <label for="p-phone">📱 Téléphone WhatsApp</label>
+            <input id="p-phone" type="tel" placeholder="+221 77 ..." maxlength="30" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="p-desc">Description (visible par le client)</label>
+          <textarea id="p-desc" rows="3" maxlength="5000" placeholder="Bonjour Aïssatou ! Voici l'espace de suivi de votre mariage à Saly. Vous y trouverez les versions du teaser et des photos. Laissez-moi vos retours en commentaire pour chaque livrable."></textarea>
+        </div>
+        <div class="field">
+          <label for="p-status">Statut</label>
+          <select id="p-status">
+            <option value="in_progress">En cours</option>
+            <option value="review">À valider</option>
+            <option value="approved">Validé</option>
+            <option value="archived">Archivé</option>
+          </select>
+        </div>
+        <div class="modal__foot">
+          <div class="modal__foot-left">
+            <button type="button" class="btn-secondary" id="project-cancel">Annuler</button>
+          </div>
+          <div class="modal__foot-right">
+            <button type="submit" class="btn-primary" id="project-save">💾 Créer &amp; Éditer</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    <!-- TAB TESTIMONIALS -->
+    <div id="tab-testimonials" class="tab-content hidden">
+      <div class="stats" id="stats-testimonials"></div>
+      <div class="toolbar">
+        <div>
+          <h2>Avis clients</h2>
+          <span class="toolbar__count" id="testimonial-count"></span>
+        </div>
+        <div class="toolbar__actions">
+          <button class="refresh-btn" id="refresh-testimonials">↻ Actualiser</button>
+          <button class="new-btn" id="share-link-btn">🔗 Lien à envoyer</button>
+        </div>
+      </div>
+      <div class="list" id="testimonials-list">
+        <div class="loading">CHARGEMENT…</div>
+      </div>
+    </div>
+
+  <!-- MODAL : Lien partageable -->
+  <div class="modal-backdrop" id="share-modal">
+    <div class="modal" style="max-width: 560px;">
+      <div class="modal__head">
+        <div class="modal__title">🔗 Lien à envoyer à un client</div>
+        <button class="modal__close" id="share-modal-close" aria-label="Fermer">✕</button>
+      </div>
+      <p style="color: var(--fg-dim); margin-bottom: 16px; font-size: 13px;">
+        Personnalise les infos pour pré-remplir le formulaire de ton client. Tu pourras ensuite copier le lien et l'envoyer par WhatsApp / email.
+      </p>
+      <div class="grid-2">
+        <div class="field">
+          <label for="share-name">Prénom / Nom du client</label>
+          <input id="share-name" placeholder="Aïssatou Diop" />
+        </div>
+        <div class="field">
+          <label for="share-role">Contexte (optionnel)</label>
+          <input id="share-role" placeholder="Mariée à Saly" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="share-project">Type de projet</label>
+        <select id="share-project">
+          <option value="">— Aucun —</option>
+          <option>Mariage</option>
+          <option>Clip</option>
+          <option>Making-Of</option>
+          <option>Concert</option>
+          <option>Documentaire</option>
+          <option>Corporate</option>
+          <option>Publicité</option>
+          <option>Reportage / Événementiel</option>
+          <option>Photographie</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="share-url">Lien généré</label>
+        <input id="share-url" readonly style="font-family: 'JetBrains Mono', monospace; font-size: 12px;" />
+      </div>
+      <div class="modal__foot" style="border-top: none; padding-top: 8px;">
+        <div class="modal__foot-left">
+          <button type="button" class="btn-secondary" id="share-modal-cancel">Fermer</button>
+        </div>
+        <div class="modal__foot-right">
+          <button type="button" class="btn-primary" id="share-copy-btn">📋 Copier le lien</button>
+          <a id="share-wa-btn" class="btn-primary" target="_blank" style="text-decoration:none;background:#25d366;">📱 Ouvrir WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL : Création / Édition de devis -->
+  <div class="modal-backdrop" id="quote-modal">
+    <div class="modal">
+      <div class="modal__head">
+        <div class="modal__title" id="quote-modal-title">Nouveau devis</div>
+        <button class="modal__close" id="quote-modal-close" aria-label="Fermer">✕</button>
+      </div>
+
+      <form id="quote-form">
+        <input type="hidden" id="q-id" />
+        <input type="hidden" id="q-related-msg" />
+
+        <!-- Client -->
+        <div class="modal__section">
+          <div class="modal__section-title">Client</div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="q-client-name">Nom *</label>
+              <input id="q-client-name" required placeholder="Nom du client" />
+            </div>
+            <div class="field">
+              <label for="q-client-email">Email</label>
+              <input id="q-client-email" type="email" placeholder="client@exemple.com" />
+            </div>
+            <div class="field">
+              <label for="q-client-phone">Téléphone</label>
+              <input id="q-client-phone" placeholder="+221 ..." />
+            </div>
+            <div class="field">
+              <label for="q-client-address">Adresse</label>
+              <input id="q-client-address" placeholder="Dakar, Sénégal" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="modal__section">
+          <div class="modal__section-title">Dates</div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="q-issue-date">Date d'émission</label>
+              <input id="q-issue-date" type="date" required />
+            </div>
+            <div class="field">
+              <label for="q-valid-until">Valable jusqu'au</label>
+              <input id="q-valid-until" type="date" required />
+            </div>
+          </div>
+        </div>
+
+        <!-- Prestations -->
+        <div class="modal__section">
+          <div class="modal__section-title">Prestations</div>
+          <p style="font-size: 12px; color: var(--fg-dim); margin-bottom: 12px;">
+            Format conseillé : 1ère ligne = catégorie (ex : PRODUCTION VIDÉO), 2ème ligne = détail (ex : Tournage · Interviews · Montage).
+          </p>
+          <div class="items-list" id="items-list"></div>
+          <button type="button" class="add-item-btn" id="add-item-btn">+ Ajouter une prestation</button>
+        </div>
+
+        <!-- TVA + Totaux -->
+        <div class="modal__section">
+          <div class="modal__section-title">Totaux &amp; TVA</div>
+          <div class="grid-2" style="margin-bottom: 12px;">
+            <div class="field">
+              <label for="q-currency">Devise</label>
+              <select id="q-currency">
+                <option value="XOF">FCFA (XOF)</option>
+                <option value="EUR">Euro (EUR)</option>
+                <option value="USD">Dollar US (USD)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="q-vat-rate">Taux TVA (%)</label>
+              <input id="q-vat-rate" type="number" min="0" max="100" step="0.01" value="0" />
+            </div>
+          </div>
+          <div class="totals">
+            <div class="totals__row"><span>Sous-total HT</span><span id="t-subtotal">—</span></div>
+            <div class="totals__row"><span>TVA <span id="t-vat-rate-label"></span></span><span id="t-vat">—</span></div>
+            <div class="totals__row totals__row--total"><span>Total TTC</span><span id="t-total">—</span></div>
+          </div>
+        </div>
+
+        <!-- Conditions -->
+        <div class="modal__section">
+          <div class="modal__section-title">Conditions</div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="q-deposit">Acompte (%)</label>
+              <input id="q-deposit" type="number" min="0" max="100" step="1" value="50" />
+            </div>
+            <div class="field">
+              <label for="q-status">Statut</label>
+              <select id="q-status">
+                <option value="draft">Brouillon</option>
+                <option value="sent">Envoyé</option>
+                <option value="accepted">Accepté</option>
+                <option value="refused">Refusé</option>
+                <option value="expired">Expiré</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="q-payment-terms">Modalités de paiement</label>
+            <textarea id="q-payment-terms" rows="3">Paiement : 50% avant la mission, 50% à la livraison.
+Livraison des contenus sous 5 à 7 jours ouvrables.
+Paiement par Wave, Orange Money ou virement bancaire.</textarea>
+          </div>
+          <div class="field">
+            <label for="q-notes">Notes (visibles sur le devis)</label>
+            <textarea id="q-notes" rows="2" placeholder="Ex : Tournage prévu en juillet, livraison sous 15 jours après tournage."></textarea>
+          </div>
+        </div>
+
+        <div class="modal__foot">
+          <div class="modal__foot-left">
+            <button type="button" class="btn-secondary" id="quote-cancel">Annuler</button>
+          </div>
+          <div class="modal__foot-right">
+            <button type="submit" class="btn-secondary" id="quote-save">💾 Sauvegarder</button>
+            <button type="button" class="btn-primary" id="quote-save-print">💾 Sauvegarder &amp; Aperçu PDF</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = 'https://bsaswpsgufyamrnrfkvw.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_E-e-dFA7UfXdZgiRL0jr5A_gVtCfjjl';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const STATUS_LABELS = { new: 'Nouveau', callback: 'À rappeler', quoted: 'Devis envoyé', converted: 'Converti', lost: 'Abandonné' };
+    const QUOTE_STATUS_LABELS = { draft: 'Brouillon', sent: 'Envoyé', accepted: 'Accepté', refused: 'Refusé', expired: 'Expiré' };
+
+    // ========== DOM ==========
+    const $ = id => document.getElementById(id);
+    const loginScreen = $('login-screen');
+    const dashboard = $('dashboard');
+    const loginForm = $('login-form');
+    const loginBtn = $('login-btn');
+    const loginError = $('login-error');
+    const logoutBtn = $('logout-btn');
+
+    // ========== AUTH ==========
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        showDashboard();
+        await Promise.all([loadMessages(), loadQuotes(), loadTestimonials(), loadProjects(), loadStats(), loadInvoices()]);
+        renderDashboard();
+      } else showLogin();
+    }
+    function showLogin() {
+      loginScreen.classList.remove('hidden');
+      dashboard.classList.add('hidden');
+    }
+    function showDashboard() {
+      loginScreen.classList.add('hidden');
+      dashboard.classList.remove('hidden');
+    }
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginError.classList.remove('is-visible');
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Connexion…';
+      const email = $('login-email').value;
+      const password = $('login-pwd').value;
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Se connecter';
+      if (error) {
+        loginError.classList.add('is-visible');
+        loginError.textContent = error.message || 'Erreur de connexion';
+        return;
+      }
+      showDashboard();
+      await Promise.all([loadMessages(), loadQuotes(), loadTestimonials(), loadProjects(), loadStats(), loadInvoices()]);
+      renderDashboard();
+    });
+    logoutBtn.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      showLogin();
+      loginForm.reset();
+    });
+
+    // ========== TABS ==========
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        const target = btn.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        $('tab-' + target).classList.remove('hidden');
+      });
+    });
+
+    // ========== UTIL ==========
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+
+    /**
+     * Normalise un numéro de téléphone (gère les formats sénégalais).
+     * Accepte : "+221 77 375 83 92", "77-375-83-92", "0773758392", "773758392"
+     * Retourne : "221773758392" (format E.164 sans +)
+     */
+    function normalizePhone(phone) {
+      if (!phone) return null;
+      let clean = String(phone).replace(/[\s\-\(\)\.\/]/g, '');
+      if (clean.startsWith('+')) clean = clean.substring(1);
+      else if (clean.startsWith('00')) clean = clean.substring(2);
+      // Numéro sénégalais 9 chiffres commençant par 7 (mobile) ou 3 (fixe)
+      if (clean.length === 9 && /^[73]/.test(clean)) clean = '221' + clean;
+      // Numéro sénégalais avec 0 initial (ex : 0773758392)
+      else if (clean.length === 10 && clean.startsWith('0')) clean = '221' + clean.substring(1);
+      if (!/^\d{8,15}$/.test(clean)) return null;
+      return clean;
+    }
+
+    /**
+     * Génère un lien WhatsApp prêt à cliquer.
+     */
+    function whatsappLink(phone, message) {
+      const clean = normalizePhone(phone);
+      if (!clean) return null;
+      return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
+    }
+
+    /**
+     * Bouton HTML standardisé — vert WhatsApp, désactivé si pas de num.
+     */
+    function whatsappBtn(phone, message, label = '📱 WhatsApp') {
+      const link = whatsappLink(phone, message);
+      if (!link) {
+        return `<button class="quote__edit-btn" disabled title="Pas de numéro de téléphone" style="opacity:0.4;cursor:not-allowed;">📱 WhatsApp</button>`;
+      }
+      return `<a class="quote__view-btn" href="${link}" target="_blank" rel="noopener" style="background:#25d366;">${label}</a>`;
+    }
+    function formatCurrency(amount, currency = 'XOF') {
+      const opts = { style: 'currency', currency };
+      if (currency === 'XOF') { opts.minimumFractionDigits = 0; opts.maximumFractionDigits = 0; }
+      try { return new Intl.NumberFormat('fr-FR', opts).format(amount); }
+      catch { return amount + ' ' + currency; }
+    }
+    function formatDate(d) {
+      if (!d) return '';
+      return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+    function formatDateTime(d) {
+      if (!d) return '';
+      return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    // ========== MESSAGES ==========
+    let allMessages = [];
+    let msgFilter = 'all';
+
+    async function loadMessages() {
+      $('messages-list').innerHTML = '<div class="loading">CHARGEMENT…</div>';
+      const { data, error } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
+      if (error) {
+        $('messages-list').innerHTML = `<div class="empty">Erreur : ${escapeHtml(error.message)}</div>`;
+        return;
+      }
+      allMessages = data || [];
+      renderMessageStats();
+      renderMessages();
+    }
+
+    function renderMessageStats() {
+      const counts = { all: allMessages.length };
+      for (const s of Object.keys(STATUS_LABELS)) counts[s] = 0;
+      for (const m of allMessages) counts[m.status] = (counts[m.status] || 0) + 1;
+      const items = [
+        { key: 'all', label: 'Total', count: counts.all, color: null },
+        { key: 'new', label: STATUS_LABELS.new, count: counts.new, color: 'new' },
+        { key: 'callback', label: STATUS_LABELS.callback, count: counts.callback, color: 'callback' },
+        { key: 'quoted', label: STATUS_LABELS.quoted, count: counts.quoted, color: 'quoted' },
+        { key: 'converted', label: STATUS_LABELS.converted, count: counts.converted, color: 'converted' },
+        { key: 'lost', label: STATUS_LABELS.lost, count: counts.lost, color: 'lost' },
+      ];
+      $('stats-messages').innerHTML = items.map(it => `
+        <div class="stat ${msgFilter === it.key ? 'is-active' : ''}" data-filter="${it.key}">
+          <div class="stat__label">${it.color ? `<span class="stat__dot dot-${it.color}"></span>` : ''}${it.label}</div>
+          <div class="stat__value">${it.count}</div>
+        </div>
+      `).join('');
+      $('stats-messages').querySelectorAll('.stat').forEach(el => {
+        el.addEventListener('click', () => {
+          msgFilter = el.dataset.filter;
+          renderMessageStats();
+          renderMessages();
+        });
+      });
+    }
+
+    function renderMessages() {
+      const filtered = msgFilter === 'all' ? allMessages : allMessages.filter(m => m.status === msgFilter);
+      $('msg-count').textContent = filtered.length === 0 ? 'Aucun' : `${filtered.length} message${filtered.length>1?'s':''}`;
+      if (filtered.length === 0) {
+        $('messages-list').innerHTML = '<div class="empty">Aucun message pour ce filtre.</div>';
+        return;
+      }
+      $('messages-list').innerHTML = filtered.map(m => `
+        <div class="msg" data-id="${m.id}">
+          <div class="msg__head">
+            <div class="msg__meta">
+              <div class="msg__name">${escapeHtml(m.name)}</div>
+              <div class="msg__contact">
+                <a href="mailto:${escapeHtml(m.email)}">✉ ${escapeHtml(m.email)}</a>
+                <span class="pill st-${m.status}"><span class="dot dot-${m.status}"></span>${STATUS_LABELS[m.status] || m.status}</span>
+              </div>
+            </div>
+            <div class="msg__date">${formatDateTime(m.created_at)}</div>
+          </div>
+          <span class="msg__type">${escapeHtml(m.project_type)}</span>
+          <div class="msg__body">${escapeHtml(m.message)}</div>
+          <div class="msg__actions">
+            <select class="msg__status" data-change-status="${m.id}">
+              ${Object.entries(STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${m.status===k?'selected':''}>${v}</option>`).join('')}
+            </select>
+            ${whatsappBtn(
+              m.phone,
+              `Bonjour ${m.name},\n\nMerci pour votre message concernant votre projet ${m.project_type} ! Je viens d'en prendre connaissance et je vous reviens très vite avec une proposition.\n\nCordialement,\nBaye Dame`,
+              '📱 Répondre'
+            )}
+            <button class="msg__create-quote" data-quote-from="${m.id}">📄 Créer un devis</button>
+            <button class="msg__delete" data-delete-msg="${m.id}">Supprimer</button>
+          </div>
+        </div>
+      `).join('');
+      $('messages-list').querySelectorAll('[data-change-status]').forEach(sel => {
+        sel.addEventListener('change', async (e) => {
+          const id = e.target.dataset.changeStatus;
+          const newStatus = e.target.value;
+          const { error } = await supabase.from('contact_messages').update({ status: newStatus }).eq('id', id);
+          if (error) return alert('Erreur : ' + error.message);
+          const msg = allMessages.find(m => m.id === id);
+          if (msg) msg.status = newStatus;
+          renderMessageStats(); renderMessages();
+        });
+      });
+      $('messages-list').querySelectorAll('[data-delete-msg]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.deleteMsg;
+          if (!confirm('Supprimer ce message ?')) return;
+          const { error } = await supabase.from('contact_messages').delete().eq('id', id);
+          if (error) return alert('Erreur : ' + error.message);
+          allMessages = allMessages.filter(m => m.id !== id);
+          renderMessageStats(); renderMessages();
+        });
+      });
+      $('messages-list').querySelectorAll('[data-quote-from]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.quoteFrom;
+          const msg = allMessages.find(m => m.id === id);
+          openQuoteModal(null, msg);
+        });
+      });
+    }
+
+    $('refresh-messages').addEventListener('click', loadMessages);
+
+    // ========== QUOTES ==========
+    let allQuotes = [];
+    let quoteFilter = 'all';
+
+    async function loadQuotes() {
+      $('quotes-list').innerHTML = '<div class="loading">CHARGEMENT…</div>';
+      const { data, error } = await supabase.from('quotes').select('*').order('created_at', { ascending: false });
+      if (error) {
+        $('quotes-list').innerHTML = `<div class="empty">Erreur : ${escapeHtml(error.message)}</div>`;
+        return;
+      }
+      allQuotes = data || [];
+      renderQuoteStats();
+      renderQuotes();
+    }
+
+    function renderQuoteStats() {
+      const counts = { all: allQuotes.length };
+      for (const s of Object.keys(QUOTE_STATUS_LABELS)) counts[s] = 0;
+      for (const q of allQuotes) counts[q.status] = (counts[q.status] || 0) + 1;
+      // Stat : montant total accepté
+      const acceptedTotal = allQuotes.filter(q => q.status === 'accepted').reduce((sum, q) => sum + Number(q.total || 0), 0);
+      const items = [
+        { key: 'all', label: 'Total', count: counts.all, color: null },
+        { key: 'draft', label: QUOTE_STATUS_LABELS.draft, count: counts.draft, color: 'draft', kind: 'q' },
+        { key: 'sent', label: QUOTE_STATUS_LABELS.sent, count: counts.sent, color: 'sent', kind: 'q' },
+        { key: 'accepted', label: QUOTE_STATUS_LABELS.accepted, count: counts.accepted, color: 'accepted', kind: 'q' },
+        { key: 'refused', label: QUOTE_STATUS_LABELS.refused, count: counts.refused, color: 'refused', kind: 'q' },
+        { key: 'expired', label: QUOTE_STATUS_LABELS.expired, count: counts.expired, color: 'expired', kind: 'q' },
+      ];
+      $('stats-quotes').innerHTML = items.map(it => `
+        <div class="stat ${quoteFilter === it.key ? 'is-active' : ''}" data-filter="${it.key}">
+          <div class="stat__label">${it.color ? `<span class="stat__dot qdot-${it.color}"></span>` : ''}${it.label}</div>
+          <div class="stat__value">${it.count}</div>
+        </div>
+      `).join('') + `
+        <div class="stat" style="cursor:default">
+          <div class="stat__label">💰 CA signé</div>
+          <div class="stat__value" style="font-size:18px">${formatCurrency(acceptedTotal, 'XOF')}</div>
+        </div>
+      `;
+      $('stats-quotes').querySelectorAll('[data-filter]').forEach(el => {
+        el.addEventListener('click', () => {
+          quoteFilter = el.dataset.filter;
+          renderQuoteStats();
+          renderQuotes();
+        });
+      });
+    }
+
+    function renderQuotes() {
+      const filtered = quoteFilter === 'all' ? allQuotes : allQuotes.filter(q => q.status === quoteFilter);
+      $('quote-count').textContent = filtered.length === 0 ? 'Aucun' : `${filtered.length} devis`;
+      if (filtered.length === 0) {
+        $('quotes-list').innerHTML = '<div class="empty">Aucun devis pour ce filtre. Clique sur « Nouveau devis » pour en créer un.</div>';
+        return;
+      }
+      $('quotes-list').innerHTML = filtered.map(q => {
+        const items = Array.isArray(q.items) ? q.items : [];
+        const preview = items.length === 0 ? 'Aucune prestation' :
+          items.map(it => `${it.description || '—'} × ${it.quantity || 1}`).join(' · ');
+        return `
+          <div class="quote" data-id="${q.id}">
+            <div class="quote__head">
+              <div>
+                <div class="quote__num">${escapeHtml(q.quote_number || 'BROUILLON')}</div>
+                <div class="quote__client">${escapeHtml(q.client_name)}</div>
+              </div>
+              <div class="quote__amount">${formatCurrency(Number(q.total || 0), q.currency || 'XOF')}</div>
+            </div>
+            <div class="quote__sub">
+              <span class="pill q-${q.status}"><span class="dot qdot-${q.status}"></span>${QUOTE_STATUS_LABELS[q.status] || q.status}</span>
+              <span>Émis le ${formatDate(q.issue_date)}</span>
+              <span>Valable jusqu'au ${formatDate(q.valid_until)}</span>
+            </div>
+            <div class="quote__items-preview">${escapeHtml(preview)}</div>
+            <div class="quote__actions">
+              <select class="quote__status" data-change-quote-status="${q.id}">
+                ${Object.entries(QUOTE_STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${q.status===k?'selected':''}>${v}</option>`).join('')}
+              </select>
+              <a class="quote__view-btn" href="quote-print.html?id=${q.id}" target="_blank">👁 Aperçu / PDF</a>
+              ${whatsappBtn(
+                q.client_phone,
+                `Bonjour ${q.client_name},\n\nVoici votre devis n° ${q.quote_number} d'un montant total de ${formatCurrency(Number(q.total), q.currency)}, valable jusqu'au ${formatDate(q.valid_until)}.\n\nN'hésitez pas si vous avez des questions.\n\nCordialement,\nBaye Dame`,
+                '📱 Envoyer'
+              )}
+              ${q.status === 'accepted' ? `<button class="quote__view-btn" data-invoice-from="${q.id}" style="background:#10b981;">💰 Créer la facture</button>` : ''}
+              <button class="quote__edit-btn" data-edit-quote="${q.id}">✎ Modifier</button>
+              <button class="quote__delete" data-delete-quote="${q.id}">Supprimer</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      $('quotes-list').querySelectorAll('[data-change-quote-status]').forEach(sel => {
+        sel.addEventListener('change', async (e) => {
+          const id = e.target.dataset.changeQuoteStatus;
+          const newStatus = e.target.value;
+          const { error } = await supabase.from('quotes').update({ status: newStatus }).eq('id', id);
+          if (error) return alert('Erreur : ' + error.message);
+          const q = allQuotes.find(x => x.id === id);
+          if (q) q.status = newStatus;
+          renderQuoteStats(); renderQuotes();
+        });
+      });
+      $('quotes-list').querySelectorAll('[data-edit-quote]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const q = allQuotes.find(x => x.id === btn.dataset.editQuote);
+          openQuoteModal(q);
+        });
+      });
+      $('quotes-list').querySelectorAll('[data-delete-quote]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.deleteQuote;
+          if (!confirm('Supprimer ce devis définitivement ?')) return;
+          const { error } = await supabase.from('quotes').delete().eq('id', id);
+          if (error) return alert('Erreur : ' + error.message);
+          allQuotes = allQuotes.filter(q => q.id !== id);
+          renderQuoteStats(); renderQuotes();
+        });
+      });
+      // Créer la facture depuis un devis accepté
+      $('quotes-list').querySelectorAll('[data-invoice-from]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const quoteId = btn.dataset.invoiceFrom;
+          await createInvoiceFromQuote(quoteId);
+        });
+      });
+    }
+
+    $('refresh-quotes').addEventListener('click', loadQuotes);
+    $('new-quote-btn').addEventListener('click', () => openQuoteModal(null));
+
+    // ========== QUOTE MODAL ==========
+    function emptyItem() { return { description: '', subtitle: '', quantity: 1, unit_price: 0 }; }
+
+    function renderItems(items) {
+      const list = $('items-list');
+      list.innerHTML = items.map((it, i) => `
+        <div class="item-card" data-i="${i}">
+          <input class="title" data-field="description" value="${escapeHtml(it.description)}" placeholder="CATÉGORIE (ex : PRODUCTION VIDÉO)" />
+          <input class="subtitle" data-field="subtitle" value="${escapeHtml(it.subtitle || '')}" placeholder="Détail (ex : Tournage · Interviews · Montage)" />
+          <div class="item-card__num">
+            <div class="item-card__num-label">Quantité</div>
+            <input data-field="quantity" type="number" min="0" step="1" value="${it.quantity}" placeholder="Qté" />
+            <input data-field="unit_price" type="number" min="0" step="0.01" value="${it.unit_price}" placeholder="Prix unitaire" />
+            <button type="button" class="item-row__del" data-del-item="${i}" title="Supprimer">✕</button>
+          </div>
+          <div class="item-row__total" data-line-total="${i}">—</div>
+        </div>
+      `).join('');
+      list.querySelectorAll('[data-field]').forEach(inp => {
+        inp.addEventListener('input', () => {
+          const i = parseInt(inp.closest('.item-card').dataset.i);
+          const field = inp.dataset.field;
+          if (field === 'description' || field === 'subtitle') items[i][field] = inp.value;
+          else items[i][field] = parseFloat(inp.value) || 0;
+          updateTotals(items);
+        });
+      });
+      list.querySelectorAll('[data-del-item]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const i = parseInt(btn.dataset.delItem);
+          items.splice(i, 1);
+          if (items.length === 0) items.push(emptyItem());
+          renderItems(items);
+          updateTotals(items);
+        });
+      });
+      updateTotals(items);
+    }
+
+    function updateTotals(items) {
+      const currency = $('q-currency').value;
+      const vatRate = parseFloat($('q-vat-rate').value) || 0;
+      const subtotal = items.reduce((sum, it) => sum + (it.quantity * it.unit_price), 0);
+      const vat = subtotal * (vatRate / 100);
+      const total = subtotal + vat;
+      $('t-subtotal').textContent = formatCurrency(subtotal, currency);
+      $('t-vat').textContent = formatCurrency(vat, currency);
+      $('t-vat-rate-label').textContent = vatRate > 0 ? `(${vatRate}%)` : '';
+      $('t-total').textContent = formatCurrency(total, currency);
+      // update line totals
+      items.forEach((it, i) => {
+        const cell = $('items-list').querySelector(`[data-line-total="${i}"]`);
+        if (cell) cell.textContent = formatCurrency(it.quantity * it.unit_price, currency);
+      });
+    }
+
+    let currentItems = [];
+    function openQuoteModal(quote = null, fromMessage = null) {
+      $('quote-modal-title').textContent = quote ? `Modifier ${quote.quote_number}` : 'Nouveau devis';
+      $('q-id').value = quote?.id || '';
+      $('q-related-msg').value = quote?.related_message_id || fromMessage?.id || '';
+      $('q-client-name').value = quote?.client_name || fromMessage?.name || '';
+      $('q-client-email').value = quote?.client_email || fromMessage?.email || '';
+      $('q-client-phone').value = quote?.client_phone || '';
+      $('q-client-address').value = quote?.client_address || '';
+      $('q-issue-date').value = quote?.issue_date || new Date().toISOString().slice(0,10);
+      $('q-valid-until').value = quote?.valid_until || new Date(Date.now() + 30*86400000).toISOString().slice(0,10);
+      $('q-currency').value = quote?.currency || 'XOF';
+      $('q-vat-rate').value = quote?.vat_rate ?? 0;
+      $('q-deposit').value = quote?.deposit_percent ?? 50;
+      $('q-status').value = quote?.status || 'draft';
+      $('q-payment-terms').value = quote?.payment_terms || 'Paiement : 50% avant la mission, 50% à la livraison.\nLivraison des contenus sous 5 à 7 jours ouvrables.\nPaiement par Wave, Orange Money ou virement bancaire.';
+
+      // Pré-remplir les notes avec le type de projet du message
+      let notesValue = quote?.notes || '';
+      if (!quote && fromMessage) {
+        notesValue = `Demande initiale (${fromMessage.project_type}) : ${fromMessage.message.substring(0, 200)}${fromMessage.message.length > 200 ? '…' : ''}`;
+      }
+      $('q-notes').value = notesValue;
+
+      // Items
+      currentItems = quote?.items && Array.isArray(quote.items) && quote.items.length > 0
+        ? quote.items.map(it => ({ ...it }))
+        : [emptyItem()];
+
+      renderItems(currentItems);
+      $('quote-modal').classList.add('is-visible');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeQuoteModal() {
+      $('quote-modal').classList.remove('is-visible');
+      document.body.style.overflow = '';
+    }
+
+    $('quote-modal-close').addEventListener('click', closeQuoteModal);
+    $('quote-cancel').addEventListener('click', closeQuoteModal);
+    $('quote-modal').addEventListener('click', (e) => {
+      if (e.target === $('quote-modal')) closeQuoteModal();
+    });
+
+    $('add-item-btn').addEventListener('click', () => {
+      currentItems.push(emptyItem());
+      renderItems(currentItems);
+    });
+
+    $('q-currency').addEventListener('change', () => updateTotals(currentItems));
+    $('q-vat-rate').addEventListener('input', () => updateTotals(currentItems));
+
+    async function saveQuote(openPrint = false) {
+      const validItems = currentItems.filter(it => (it.description || '').trim() && Number(it.quantity) > 0);
+      if (validItems.length === 0) {
+        alert('Ajoute au moins une prestation avec description et quantité.');
+        return null;
+      }
+      const subtotal = validItems.reduce((s, it) => s + (Number(it.quantity) * Number(it.unit_price)), 0);
+      const vatRate = parseFloat($('q-vat-rate').value) || 0;
+      const vatAmount = subtotal * (vatRate / 100);
+      const total = subtotal + vatAmount;
+
+      const payload = {
+        client_name: $('q-client-name').value.trim(),
+        client_email: $('q-client-email').value.trim() || null,
+        client_phone: $('q-client-phone').value.trim() || null,
+        client_address: $('q-client-address').value.trim() || null,
+        issue_date: $('q-issue-date').value,
+        valid_until: $('q-valid-until').value,
+        items: validItems,
+        subtotal,
+        vat_rate: vatRate,
+        vat_amount: vatAmount,
+        total,
+        currency: $('q-currency').value,
+        deposit_percent: parseFloat($('q-deposit').value) || 0,
+        payment_terms: $('q-payment-terms').value.trim() || null,
+        notes: $('q-notes').value.trim() || null,
+        status: $('q-status').value,
+        related_message_id: $('q-related-msg').value || null,
+      };
+
+      const id = $('q-id').value;
+      let result;
+      if (id) {
+        result = await supabase.from('quotes').update(payload).eq('id', id).select().single();
+      } else {
+        result = await supabase.from('quotes').insert(payload).select().single();
+      }
+
+      if (result.error) {
+        alert('Erreur : ' + result.error.message);
+        return null;
+      }
+
+      await loadQuotes();
+      closeQuoteModal();
+
+      if (openPrint && result.data) {
+        window.open(`quote-print.html?id=${result.data.id}`, '_blank');
+      }
+      return result.data;
+    }
+
+    $('quote-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      saveQuote(false);
+    });
+    $('quote-save-print').addEventListener('click', () => saveQuote(true));
+
+    // ========== TESTIMONIALS ==========
+    const TEST_STATUS_LABELS = { pending: 'En attente', approved: 'Approuvé', rejected: 'Rejeté' };
+    let allTestimonials = [];
+    let testFilter = 'all';
+
+    async function loadTestimonials() {
+      $('testimonials-list').innerHTML = '<div class="loading">CHARGEMENT…</div>';
+      const { data, error } = await supabase.from('testimonials').select('*').order('created_at', { ascending: false });
+      if (error) {
+        $('testimonials-list').innerHTML = `<div class="empty">Erreur : ${escapeHtml(error.message)}</div>`;
+        return;
+      }
+      allTestimonials = data || [];
+      renderTestStats();
+      renderTestimonials();
+    }
+
+    function renderTestStats() {
+      const counts = { all: allTestimonials.length };
+      for (const s of Object.keys(TEST_STATUS_LABELS)) counts[s] = 0;
+      for (const t of allTestimonials) counts[t.status] = (counts[t.status] || 0) + 1;
+      const approved = allTestimonials.filter(t => t.status === 'approved');
+      const avgRating = approved.length > 0
+        ? (approved.reduce((s,t) => s + t.rating, 0) / approved.length).toFixed(1)
+        : '—';
+      const items = [
+        { key: 'all', label: 'Total', count: counts.all },
+        { key: 'pending', label: '⏳ En attente', count: counts.pending },
+        { key: 'approved', label: '✓ Approuvés', count: counts.approved },
+        { key: 'rejected', label: '✕ Rejetés', count: counts.rejected },
+      ];
+      $('stats-testimonials').innerHTML = items.map(it => `
+        <div class="stat ${testFilter === it.key ? 'is-active' : ''}" data-filter="${it.key}">
+          <div class="stat__label">${it.label}</div>
+          <div class="stat__value">${it.count}</div>
+        </div>
+      `).join('') + `
+        <div class="stat" style="cursor:default">
+          <div class="stat__label">⭐ Note moyenne</div>
+          <div class="stat__value">${avgRating}<span style="font-size:13px; color:var(--fg-dim)"> / 5</span></div>
+        </div>
+      `;
+      $('stats-testimonials').querySelectorAll('[data-filter]').forEach(el => {
+        el.addEventListener('click', () => {
+          testFilter = el.dataset.filter;
+          renderTestStats();
+          renderTestimonials();
+        });
+      });
+    }
+
+    function starsHtml(rating) {
+      let out = '';
+      for (let i = 1; i <= 5; i++) {
+        out += `<span style="color:${i<=rating?'#e8b685':'var(--line-strong)'}">★</span>`;
+      }
+      return out;
+    }
+
+    function renderTestimonials() {
+      const filtered = testFilter === 'all' ? allTestimonials : allTestimonials.filter(t => t.status === testFilter);
+      $('testimonial-count').textContent = filtered.length === 0 ? 'Aucun' : `${filtered.length} avis`;
+      if (filtered.length === 0) {
+        $('testimonials-list').innerHTML = '<div class="empty">Aucun avis pour ce filtre. Envoie le lien à tes clients via le bouton « Lien à envoyer » 🔗</div>';
+        return;
+      }
+      $('testimonials-list').innerHTML = filtered.map(t => `
+        <div class="msg" data-id="${t.id}">
+          <div class="msg__head">
+            <div class="msg__meta">
+              <div class="msg__name">${escapeHtml(t.client_name)}</div>
+              <div class="msg__contact">
+                ${t.client_role ? `<span style="color:var(--fg-dim)">${escapeHtml(t.client_role)}</span>` : ''}
+                <span style="font-size:18px; letter-spacing:2px;">${starsHtml(t.rating)}</span>
+                <span class="pill ${t.status === 'approved' ? 'st-converted' : t.status === 'rejected' ? 'st-lost' : 'st-callback'}">${TEST_STATUS_LABELS[t.status]}</span>
+              </div>
+            </div>
+            <div class="msg__date">${formatDateTime(t.created_at)}</div>
+          </div>
+          ${t.project_type ? `<span class="msg__type">${escapeHtml(t.project_type)}</span>` : ''}
+          <div class="msg__body" style="font-style: italic;">« ${escapeHtml(t.message)} »</div>
+          <div class="msg__actions">
+            ${t.status !== 'approved' ? `<button class="new-btn" data-approve="${t.id}" style="background:#10b981;">✓ Approuver</button>` : ''}
+            ${t.status !== 'rejected' ? `<button class="btn-secondary" data-reject="${t.id}" style="padding:6px 14px;font-size:13px;">✕ Rejeter</button>` : ''}
+            ${t.status !== 'pending' ? `<button class="btn-secondary" data-pending="${t.id}" style="padding:6px 14px;font-size:13px;">⏳ Remettre en attente</button>` : ''}
+            <button class="msg__delete" data-delete-test="${t.id}">Supprimer</button>
+          </div>
+        </div>
+      `).join('');
+
+      const setStatus = async (id, status) => {
+        const { error } = await supabase.from('testimonials').update({ status }).eq('id', id);
+        if (error) return alert('Erreur : ' + error.message);
+        const t = allTestimonials.find(x => x.id === id);
+        if (t) t.status = status;
+        renderTestStats(); renderTestimonials();
+      };
+      $('testimonials-list').querySelectorAll('[data-approve]').forEach(b => b.addEventListener('click', () => setStatus(b.dataset.approve, 'approved')));
+      $('testimonials-list').querySelectorAll('[data-reject]').forEach(b => b.addEventListener('click', () => setStatus(b.dataset.reject, 'rejected')));
+      $('testimonials-list').querySelectorAll('[data-pending]').forEach(b => b.addEventListener('click', () => setStatus(b.dataset.pending, 'pending')));
+      $('testimonials-list').querySelectorAll('[data-delete-test]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.deleteTest;
+          if (!confirm('Supprimer cet avis définitivement ?')) return;
+          const { error } = await supabase.from('testimonials').delete().eq('id', id);
+          if (error) return alert('Erreur : ' + error.message);
+          allTestimonials = allTestimonials.filter(t => t.id !== id);
+          renderTestStats(); renderTestimonials();
+        });
+      });
+    }
+
+    $('refresh-testimonials').addEventListener('click', loadTestimonials);
+
+    // ========== SHARE LINK MODAL ==========
+    function buildShareUrl() {
+      const base = window.location.origin + '/avis.html';
+      const params = new URLSearchParams();
+      const n = $('share-name').value.trim();
+      const r = $('share-role').value.trim();
+      const p = $('share-project').value;
+      if (n) params.set('nom', n);
+      if (r) params.set('role', r);
+      if (p) params.set('projet', p);
+      const url = params.toString() ? `${base}?${params}` : base;
+      $('share-url').value = url;
+      const waMessage = encodeURIComponent(
+        `Bonjour ${n || ''} ! Merci pour ce beau projet ensemble 🙏\n\n` +
+        `Si tu as 1 minute, j'aurais besoin de ton avis sur notre collaboration. ` +
+        `Ton retour m'aide énormément à attirer de futurs clients. Voici le lien : ${url}\n\nMerci infiniment ! — Baye Dame`
+      );
+      $('share-wa-btn').href = `https://wa.me/?text=${waMessage}`;
+    }
+    $('share-link-btn').addEventListener('click', () => {
+      $('share-name').value = '';
+      $('share-role').value = '';
+      $('share-project').value = '';
+      buildShareUrl();
+      $('share-modal').classList.add('is-visible');
+      document.body.style.overflow = 'hidden';
+    });
+    ['share-name', 'share-role', 'share-project'].forEach(id => {
+      $(id).addEventListener('input', buildShareUrl);
+      $(id).addEventListener('change', buildShareUrl);
+    });
+    function closeShareModal() {
+      $('share-modal').classList.remove('is-visible');
+      document.body.style.overflow = '';
+    }
+    $('share-modal-close').addEventListener('click', closeShareModal);
+    $('share-modal-cancel').addEventListener('click', closeShareModal);
+    $('share-modal').addEventListener('click', (e) => {
+      if (e.target === $('share-modal')) closeShareModal();
+    });
+    $('share-copy-btn').addEventListener('click', async () => {
+      const url = $('share-url').value;
+      try {
+        await navigator.clipboard.writeText(url);
+        const btn = $('share-copy-btn');
+        const original = btn.textContent;
+        btn.textContent = '✓ Copié !';
+        setTimeout(() => { btn.textContent = original; }, 1500);
+      } catch (err) {
+        $('share-url').select();
+        alert('Copie manuelle : ' + url);
+      }
+    });
+
+    // ========== PROJECTS (espaces clients) ==========
+    const PROJECT_STATUS_LABELS = {
+      in_progress: 'En cours',
+      review: 'À valider',
+      approved: 'Validé',
+      archived: 'Archivé'
+    };
+    let allProjects = [];
+    let projectFilter = 'all';
+    let projectCommentCounts = {};
+    let unresolvedCommentCounts = {};
+
+    async function loadProjects() {
+      $('projects-list').innerHTML = '<div class="loading">CHARGEMENT…</div>';
+      const { data, error } = await supabase
+        .from('client_projects')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) {
+        $('projects-list').innerHTML = `<div class="empty">Erreur : ${escapeHtml(error.message)}</div>`;
+        return;
+      }
+      allProjects = data || [];
+
+      // Récupère le nombre de commentaires non résolus par projet
+      const { data: comments } = await supabase
+        .from('project_comments')
+        .select('project_id, resolved, author');
+      projectCommentCounts = {};
+      unresolvedCommentCounts = {};
+      (comments || []).forEach(c => {
+        projectCommentCounts[c.project_id] = (projectCommentCounts[c.project_id] || 0) + 1;
+        if (!c.resolved && c.author === 'client') {
+          unresolvedCommentCounts[c.project_id] = (unresolvedCommentCounts[c.project_id] || 0) + 1;
+        }
+      });
+
+      renderProjectStats();
+      renderProjects();
+    }
+
+    function renderProjectStats() {
+      const counts = { all: allProjects.length };
+      for (const s of Object.keys(PROJECT_STATUS_LABELS)) counts[s] = 0;
+      for (const p of allProjects) counts[p.status] = (counts[p.status] || 0) + 1;
+      const totalUnresolved = Object.values(unresolvedCommentCounts).reduce((a, b) => a + b, 0);
+      const items = [
+        { key: 'all', label: 'Total', count: counts.all },
+        { key: 'in_progress', label: '🚧 En cours', count: counts.in_progress },
+        { key: 'review', label: '👁 À valider', count: counts.review },
+        { key: 'approved', label: '✓ Validés', count: counts.approved },
+        { key: 'archived', label: '📦 Archivés', count: counts.archived },
+      ];
+      $('stats-projects').innerHTML = items.map(it => `
+        <div class="stat ${projectFilter === it.key ? 'is-active' : ''}" data-filter="${it.key}">
+          <div class="stat__label">${it.label}</div>
+          <div class="stat__value">${it.count}</div>
+        </div>
+      `).join('') + `
+        <div class="stat" style="cursor:default;${totalUnresolved > 0 ? 'border-color:#ef4444;' : ''}">
+          <div class="stat__label">💬 Retours à traiter</div>
+          <div class="stat__value" style="${totalUnresolved > 0 ? 'color:#ef4444;' : ''}">${totalUnresolved}</div>
+        </div>
+      `;
+      $('stats-projects').querySelectorAll('[data-filter]').forEach(el => {
+        el.addEventListener('click', () => {
+          projectFilter = el.dataset.filter;
+          renderProjectStats();
+          renderProjects();
+        });
+      });
+    }
+
+    function renderProjects() {
+      const filtered = projectFilter === 'all' ? allProjects : allProjects.filter(p => p.status === projectFilter);
+      $('project-count').textContent = filtered.length === 0 ? 'Aucun' : `${filtered.length} projet${filtered.length>1?'s':''}`;
+      if (filtered.length === 0) {
+        $('projects-list').innerHTML = '<div class="empty">Aucun projet pour ce filtre. Clique sur « Nouveau projet » pour créer un espace client.</div>';
+        return;
+      }
+      $('projects-list').innerHTML = filtered.map(p => {
+        const projUrl = `${window.location.origin}/projet.html?p=${encodeURIComponent(p.slug)}`;
+        const totalComments = projectCommentCounts[p.id] || 0;
+        const unresolved = unresolvedCommentCounts[p.id] || 0;
+        return `
+          <div class="quote" data-id="${p.id}">
+            <div class="quote__head">
+              <div>
+                <div class="quote__num">🎬 ${escapeHtml(p.slug)}</div>
+                <div class="quote__client">${escapeHtml(p.title)}</div>
+                <div style="font-size:13px; color:var(--fg-dim); margin-top:4px;">Client : ${escapeHtml(p.client_name)}</div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                <span class="pill ${p.status === 'approved' ? 'st-converted' : p.status === 'review' ? 'st-quoted' : p.status === 'archived' ? 'st-lost' : 'st-callback'}">${PROJECT_STATUS_LABELS[p.status]}</span>
+                ${unresolved > 0 ? `<span class="pill" style="background:rgba(239,68,68,0.15); color:#ef4444;">${unresolved} retour${unresolved>1?'s':''} client</span>` : ''}
+              </div>
+            </div>
+            <div class="quote__sub">
+              <span>Créé le ${formatDate(p.created_at)}</span>
+              <span>💬 ${totalComments} commentaire${totalComments>1?'s':''}</span>
+            </div>
+            <div class="quote__items-preview" style="word-break:break-all; font-family:'JetBrains Mono', monospace; font-size:11px;">
+              🔗 ${projUrl}
+            </div>
+            <div class="quote__actions">
+              <a class="quote__view-btn" href="admin-project.html?id=${p.id}">✎ Éditer le contenu</a>
+              <a class="quote__edit-btn" href="${projUrl}" target="_blank">👁 Voir comme le client</a>
+              <button class="quote__edit-btn" data-copy-link="${projUrl}">📋 Copier le lien</button>
+              ${whatsappBtn(
+                p.client_phone,
+                `Bonjour ${p.client_name},\n\nVoici le lien vers l'espace privé de votre projet "${p.title}" :\n${projUrl}\n\nVous pourrez y consulter les livrables et laisser vos retours directement.\n\nÀ très vite,\nBaye Dame`,
+                '📱 Envoyer lien'
+              )}
+              <button class="quote__edit-btn" data-edit-project="${p.id}">⚙ Infos</button>
+              <button class="quote__delete" data-delete-project="${p.id}">Supprimer</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Copy link
+      $('projects-list').querySelectorAll('[data-copy-link]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(btn.dataset.copyLink);
+            const orig = btn.textContent;
+            btn.textContent = '✓ Copié !';
+            setTimeout(() => { btn.textContent = orig; }, 1500);
+          } catch {
+            alert(btn.dataset.copyLink);
+          }
+        });
+      });
+      // Edit infos
+      $('projects-list').querySelectorAll('[data-edit-project]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const p = allProjects.find(x => x.id === btn.dataset.editProject);
+          openProjectModal(p);
+        });
+      });
+      // Delete
+      $('projects-list').querySelectorAll('[data-delete-project]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.deleteProject;
+          if (!confirm('Supprimer ce projet et tous ses livrables/commentaires ?\n\nLe client ne pourra plus accéder au lien.')) return;
+          const { error } = await supabase.from('client_projects').delete().eq('id', id);
+          if (error) return alert('Erreur : ' + error.message);
+          allProjects = allProjects.filter(p => p.id !== id);
+          renderProjectStats();
+          renderProjects();
+        });
+      });
+    }
+
+    $('refresh-projects').addEventListener('click', loadProjects);
+
+    // ===== Modal création / édition de projet =====
+    function openProjectModal(project = null) {
+      $('project-modal').classList.add('is-visible');
+      document.body.style.overflow = 'hidden';
+      $('p-id').value = project?.id || '';
+      $('p-title').value = project?.title || '';
+      $('p-client').value = project?.client_name || '';
+      $('p-email').value = project?.client_email || '';
+      $('p-phone').value = project?.client_phone || '';
+      $('p-desc').value = project?.description || '';
+      $('p-status').value = project?.status || 'in_progress';
+      $('project-save').textContent = project ? '💾 Mettre à jour' : '💾 Créer & Éditer';
+      document.querySelector('#project-modal .modal__title').textContent = project ? 'Modifier les infos' : '🎬 Nouveau projet client';
+    }
+    function closeProjectModal() {
+      $('project-modal').classList.remove('is-visible');
+      document.body.style.overflow = '';
+    }
+    $('new-project-btn').addEventListener('click', () => openProjectModal(null));
+    $('project-modal-close').addEventListener('click', closeProjectModal);
+    $('project-cancel').addEventListener('click', closeProjectModal);
+    $('project-modal').addEventListener('click', (e) => {
+      if (e.target === $('project-modal')) closeProjectModal();
+    });
+
+    $('project-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = $('p-id').value;
+      const payload = {
+        title: $('p-title').value.trim(),
+        client_name: $('p-client').value.trim(),
+        client_email: $('p-email').value.trim() || null,
+        client_phone: $('p-phone').value.trim() || null,
+        description: $('p-desc').value.trim() || null,
+        status: $('p-status').value,
+      };
+      let result;
+      if (id) {
+        result = await supabase.from('client_projects').update(payload).eq('id', id).select().single();
+      } else {
+        result = await supabase.from('client_projects').insert(payload).select().single();
+      }
+      if (result.error) return alert('Erreur : ' + result.error.message);
+      closeProjectModal();
+      await loadProjects();
+      // Si création, rediriger vers l'éditeur du projet
+      if (!id && result.data) {
+        window.location.href = `admin-project.html?id=${result.data.id}`;
+      }
+    });
+
+    // ========== STATS / ANALYTICS ==========
+    const PAGE_LABELS = {
+      '/': 'Accueil',
+      '/index.html': 'Accueil',
+      '/avis.html': 'Formulaire d\'avis',
+      '/projet.html': 'Espace client',
+      '/legal.html': 'Mentions légales'
+    };
+    const SOURCE_LABELS = {
+      direct: '🔗 Direct / Bouche-à-oreille',
+      google: '🔍 Google',
+      instagram: '📷 Instagram',
+      facebook: '👥 Facebook',
+      whatsapp: '💬 WhatsApp',
+      twitter: '🐦 Twitter / X',
+      youtube: '▶️ YouTube',
+      linkedin: '💼 LinkedIn',
+      tiktok: '🎵 TikTok',
+      behance: '🎨 Behance',
+      vimeo: '🎥 Vimeo',
+      internal: '↩️ Navigation interne',
+      other: '🌐 Autre'
+    };
+    const DEVICE_LABELS = { mobile: '📱 Mobile', tablet: '📱 Tablette', desktop: '💻 Ordinateur' };
+    const COUNTRY_NAMES = {
+      SN: 'Sénégal', FR: 'France', CI: 'Côte d\'Ivoire', ML: 'Mali', US: 'États-Unis',
+      MA: 'Maroc', DZ: 'Algérie', TN: 'Tunisie', BE: 'Belgique', CH: 'Suisse', CA: 'Canada',
+      DE: 'Allemagne', IT: 'Italie', ES: 'Espagne', UK: 'Royaume-Uni', GB: 'Royaume-Uni',
+      NL: 'Pays-Bas', PT: 'Portugal', LU: 'Luxembourg', GN: 'Guinée', BJ: 'Bénin',
+      BF: 'Burkina Faso', TG: 'Togo', NG: 'Nigeria', GH: 'Ghana', CM: 'Cameroun',
+      RU: 'Russie', JP: 'Japon', CN: 'Chine', BR: 'Brésil', AU: 'Australie', IN: 'Inde'
+    };
+
+    let statsPeriod = 30;
+
+    async function loadStats() {
+      const since = new Date();
+      since.setDate(since.getDate() - statsPeriod);
+      const { data, error } = await supabase
+        .from('page_views')
+        .select('page_path, referrer_source, country, device, viewed_at')
+        .gte('viewed_at', since.toISOString())
+        .order('viewed_at', { ascending: false })
+        .limit(50000);
+      if (error) {
+        console.warn('Erreur stats', error);
+        return;
+      }
+      renderStats(data || []);
+    }
+
+    function renderStats(views) {
+      // ===== KPIs =====
+      const now = Date.now();
+      const dayMs = 86400000;
+      const thisWeek = views.filter(v => now - new Date(v.viewed_at).getTime() < 7 * dayMs).length;
+      const lastWeek = views.filter(v => {
+        const t = now - new Date(v.viewed_at).getTime();
+        return t >= 7 * dayMs && t < 14 * dayMs;
+      }).length;
+      const delta = lastWeek === 0 ? (thisWeek > 0 ? 100 : 0) : Math.round(((thisWeek - lastWeek) / lastWeek) * 100);
+      const deltaSign = delta > 0 ? '+' : '';
+      const uniqueCountries = new Set(views.map(v => v.country).filter(Boolean)).size;
+      const uniquePages = new Set(views.map(v => v.page_path)).size;
+
+      $('stats-kpis').innerHTML = `
+        <div class="stat" style="cursor:default">
+          <div class="stat__label">📊 Total période</div>
+          <div class="stat__value">${views.length}</div>
+        </div>
+        <div class="stat" style="cursor:default">
+          <div class="stat__label">📅 7 derniers jours</div>
+          <div class="stat__value">${thisWeek}</div>
+        </div>
+        <div class="stat" style="cursor:default">
+          <div class="stat__label">📈 vs semaine -1</div>
+          <div class="stat__value" style="color:${delta>=0?'#10b981':'#ef4444'};">${deltaSign}${delta}%</div>
+        </div>
+        <div class="stat" style="cursor:default">
+          <div class="stat__label">🌍 Pays</div>
+          <div class="stat__value">${uniqueCountries}</div>
+        </div>
+        <div class="stat" style="cursor:default">
+          <div class="stat__label">📄 Pages visitées</div>
+          <div class="stat__value">${uniquePages}</div>
+        </div>
+      `;
+
+      // ===== Chart : Vues par jour =====
+      const days = [];
+      for (let i = statsPeriod - 1; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        d.setHours(0,0,0,0);
+        days.push({ date: d, count: 0 });
+      }
+      views.forEach(v => {
+        const vd = new Date(v.viewed_at);
+        vd.setHours(0,0,0,0);
+        const found = days.find(d => d.date.getTime() === vd.getTime());
+        if (found) found.count++;
+      });
+      const maxCount = Math.max(1, ...days.map(d => d.count));
+      const chartEl = $('chart-views');
+      const emptyEl = $('chart-empty');
+      if (views.length === 0) {
+        chartEl.innerHTML = '';
+        emptyEl.classList.remove('hidden');
+      } else {
+        emptyEl.classList.add('hidden');
+        const barWidth = statsPeriod <= 7 ? 50 : statsPeriod <= 30 ? 20 : statsPeriod <= 90 ? 8 : 3;
+        chartEl.innerHTML = days.map(d => {
+          const height = d.count === 0 ? 2 : Math.round((d.count / maxCount) * 100);
+          const label = d.date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+          return `
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px; flex-shrink:0; width:${barWidth}px;" title="${label} : ${d.count} visite${d.count>1?'s':''}">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size:9px; color:var(--fg-dim); min-height:14px;">${d.count > 0 ? d.count : ''}</div>
+              <div style="width:100%; height:${height}%; background:var(--accent); border-radius:3px 3px 0 0; min-height:2px; opacity:${d.count===0?0.2:0.9}; transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=${d.count===0?0.2:0.9}"></div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // ===== Top pages =====
+      const pageCounts = {};
+      views.forEach(v => { pageCounts[v.page_path] = (pageCounts[v.page_path] || 0) + 1; });
+      $('top-pages').innerHTML = renderBarList(pageCounts, key => PAGE_LABELS[key] || key, 8);
+
+      // ===== Sources =====
+      const sourceCounts = {};
+      views.forEach(v => {
+        const s = v.referrer_source || 'direct';
+        sourceCounts[s] = (sourceCounts[s] || 0) + 1;
+      });
+      $('top-sources').innerHTML = renderBarList(sourceCounts, key => SOURCE_LABELS[key] || key, 8);
+
+      // ===== Pays =====
+      const countryCounts = {};
+      views.forEach(v => {
+        if (v.country) countryCounts[v.country] = (countryCounts[v.country] || 0) + 1;
+      });
+      const countriesHtml = Object.keys(countryCounts).length === 0
+        ? '<div class="empty" style="padding:20px;font-size:12px;">Pas encore de données pays.</div>'
+        : renderBarList(countryCounts, key => `${countryFlag(key)} ${COUNTRY_NAMES[key] || key}`, 10);
+      $('top-countries').innerHTML = countriesHtml;
+
+      // ===== Devices =====
+      const deviceCounts = {};
+      views.forEach(v => {
+        const d = v.device || 'desktop';
+        deviceCounts[d] = (deviceCounts[d] || 0) + 1;
+      });
+      $('top-devices').innerHTML = renderBarList(deviceCounts, key => DEVICE_LABELS[key] || key, 5);
+    }
+
+    function renderBarList(counts, labelFn, limit) {
+      const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, limit);
+      if (entries.length === 0) return '<div class="empty" style="padding:20px;font-size:12px;">—</div>';
+      const max = entries[0][1];
+      const total = Object.values(counts).reduce((a, b) => a + b, 0);
+      return entries.map(([key, count]) => {
+        const pct = Math.round((count / max) * 100);
+        const share = Math.round((count / total) * 100);
+        return `
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
+                <span style="font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(labelFn(key))}</span>
+                <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--fg-dim); white-space:nowrap;">${count} · ${share}%</span>
+              </div>
+              <div style="background: rgba(200,116,58,0.15); height:6px; border-radius:3px; overflow:hidden;">
+                <div style="background: var(--accent); width:${pct}%; height:100%; border-radius:3px;"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function countryFlag(code) {
+      if (!code || code.length !== 2) return '';
+      const base = 127397;
+      return String.fromCodePoint(...code.toUpperCase().split('').map(c => c.charCodeAt(0) + base));
+    }
+
+    $('refresh-stats').addEventListener('click', loadStats);
+    $('stats-period').addEventListener('change', (e) => {
+      statsPeriod = parseInt(e.target.value);
+      $('stats-range').textContent = e.target.options[e.target.selectedIndex].text;
+      loadStats();
+    });
+
+    // ========== DASHBOARD (Vue d'ensemble business) ==========
+    function renderDashboard() {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const dayMs = 86400000;
+
+      // --- KPIs ---
+      // CA encaissé ce mois (paiements de ce mois)
+      let caMois = 0;
+      const allPayments = [];
+      Object.values(allPaymentsByInvoice).forEach(arr => arr.forEach(p => {
+        allPayments.push(p);
+        const d = new Date(p.received_at);
+        if (d >= startOfMonth) caMois += Number(p.amount);
+      }));
+
+      // Factures impayées (total à recouvrer)
+      let impaye = 0;
+      let nbImpayees = 0;
+      let nbEnRetard = 0;
+      allInvoices.forEach(inv => {
+        if (inv.payment_status === 'paid' || inv.payment_status === 'cancelled') return;
+        const reste = Number(inv.total) - Number(inv.amount_paid);
+        if (reste > 0) {
+          impaye += reste;
+          nbImpayees++;
+          if (inv.payment_status === 'overdue' || new Date(inv.due_date) < now) {
+            nbEnRetard++;
+          }
+        }
+      });
+
+      // Devis en attente (sent, ni accepted ni refused)
+      const devisEnvoyes = allQuotes.filter(q => q.status === 'sent');
+      const nbDevisEnvoyes = devisEnvoyes.length;
+
+      // Projets actifs
+      const projetsActifs = allProjects.filter(p => p.status === 'in_progress' || p.status === 'review').length;
+
+      // Messages nouveaux
+      const messagesNouveaux = allMessages.filter(m => m.status === 'new').length;
+
+      // CA total tous temps
+      const caTotal = allPayments.reduce((s, p) => s + Number(p.amount), 0);
+
+      $('dashboard-kpis').innerHTML = `
+        <div class="stat" style="cursor:default; border-color:#10b981;">
+          <div class="stat__label" style="color:#10b981;">💰 CA encaissé ce mois</div>
+          <div class="stat__value" style="font-size:20px; color:#10b981;">${formatCurrency(caMois, 'XOF')}</div>
+        </div>
+        <div class="stat" style="cursor:default;">
+          <div class="stat__label">📊 CA total tous temps</div>
+          <div class="stat__value" style="font-size:20px;">${formatCurrency(caTotal, 'XOF')}</div>
+        </div>
+        <div class="stat" style="cursor:default; ${nbEnRetard > 0 ? 'border-color:#ef4444;' : ''}">
+          <div class="stat__label">⏳ À recouvrer (${nbImpayees})</div>
+          <div class="stat__value" style="font-size:20px; color: var(--accent);">${formatCurrency(impaye, 'XOF')}</div>
+        </div>
+        <div class="stat" style="cursor:default;">
+          <div class="stat__label">📄 Devis envoyés</div>
+          <div class="stat__value">${nbDevisEnvoyes}</div>
+        </div>
+        <div class="stat" style="cursor:default;">
+          <div class="stat__label">🎬 Projets actifs</div>
+          <div class="stat__value">${projetsActifs}</div>
+        </div>
+        <div class="stat" style="cursor:default; ${messagesNouveaux > 0 ? 'border-color: var(--accent);' : ''}">
+          <div class="stat__label">📥 Nouveaux messages</div>
+          <div class="stat__value" style="color: ${messagesNouveaux > 0 ? 'var(--accent)' : 'var(--fg)'};">${messagesNouveaux}</div>
+        </div>
+      `;
+
+      // --- Alertes ---
+      const alerts = [];
+      // Factures en retard
+      allInvoices.forEach(inv => {
+        if (inv.payment_status === 'paid' || inv.payment_status === 'cancelled') return;
+        const due = new Date(inv.due_date);
+        const daysOver = Math.floor((now - due) / dayMs);
+        if (daysOver > 0) {
+          alerts.push({
+            type: 'overdue',
+            icon: '⚠️',
+            color: '#ef4444',
+            text: `Facture <strong>${inv.invoice_number}</strong> — <strong>${inv.client_name}</strong> en retard de <strong>${daysOver}j</strong> · ${formatCurrency(Number(inv.total) - Number(inv.amount_paid), inv.currency)} à récupérer`,
+            cta: { label: 'Voir', tab: 'invoices' }
+          });
+        }
+      });
+      // Devis envoyés depuis longtemps sans réponse
+      devisEnvoyes.forEach(q => {
+        const updated = new Date(q.updated_at || q.created_at);
+        const days = Math.floor((now - updated) / dayMs);
+        if (days >= 7) {
+          alerts.push({
+            type: 'stale_quote',
+            icon: '🔔',
+            color: 'var(--accent)',
+            text: `Devis <strong>${q.quote_number}</strong> envoyé à <strong>${q.client_name}</strong> il y a <strong>${days}j</strong> — relancer ?`,
+            cta: { label: 'Voir', tab: 'quotes' }
+          });
+        }
+      });
+      // Messages non traités
+      if (messagesNouveaux > 0) {
+        alerts.push({
+          type: 'new_msg',
+          icon: '✉️',
+          color: 'var(--accent)',
+          text: `<strong>${messagesNouveaux} message${messagesNouveaux>1?'s':''}</strong> non traité${messagesNouveaux>1?'s':''}`,
+          cta: { label: 'Voir', tab: 'messages' }
+        });
+      }
+
+      $('dashboard-alerts').innerHTML = alerts.length === 0
+        ? `<div style="padding: 16px; background: rgba(16,185,129,0.08); border: 1px solid #10b981; border-radius: 8px; color: #10b981; font-size: 13px; margin-bottom: 24px;">✓ Aucune alerte. Tout est sous contrôle.</div>`
+        : `<div style="margin-bottom: 24px;">${alerts.map(a => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; margin-bottom: 6px; background: rgba(0,0,0,0.2); border-left: 3px solid ${a.color}; border-radius: 4px; font-size: 13px; gap: 12px;">
+              <span>${a.icon} ${a.text}</span>
+              <button data-goto-tab="${a.cta.tab}" style="padding: 4px 12px; background: transparent; border: 1px solid var(--line-strong); color: var(--fg); border-radius: 4px; font-size: 12px; cursor: pointer; white-space: nowrap;">${a.cta.label} →</button>
+            </div>
+          `).join('')}</div>`;
+
+      $('dashboard-alerts').querySelectorAll('[data-goto-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.dataset.gotoTab;
+          document.querySelector(`[data-tab="${tab}"]`)?.click();
+        });
+      });
+
+      // --- Chart CA par mois (12 derniers) ---
+      const months = [];
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push({ date: d, total: 0 });
+      }
+      allPayments.forEach(p => {
+        const pd = new Date(p.received_at);
+        const month = months.find(m => m.date.getMonth() === pd.getMonth() && m.date.getFullYear() === pd.getFullYear());
+        if (month) month.total += Number(p.amount);
+      });
+      const max = Math.max(1, ...months.map(m => m.total));
+      const hasData = months.some(m => m.total > 0);
+      const chartEl = $('ca-chart');
+      const emptyEl = $('ca-chart-empty');
+
+      if (!hasData) {
+        chartEl.innerHTML = '';
+        emptyEl.classList.remove('hidden');
+      } else {
+        emptyEl.classList.add('hidden');
+        chartEl.innerHTML = months.map(m => {
+          const height = m.total === 0 ? 2 : Math.round((m.total / max) * 100);
+          const monthLabel = m.date.toLocaleDateString('fr-FR', { month: 'short' });
+          const yearLabel = m.date.getFullYear() !== now.getFullYear() ? ` ${m.date.getFullYear().toString().slice(-2)}` : '';
+          return `
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px; flex: 1; min-width: 0;" title="${monthLabel}${yearLabel} : ${formatCurrency(m.total, 'XOF')}">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size:9px; color:${m.total>0?'var(--accent)':'var(--fg-dim)'}; min-height:14px; white-space:nowrap;">${m.total > 0 ? formatCurrency(m.total, 'XOF').replace(/\s/g, '') : ''}</div>
+              <div style="width:100%; height:${height}%; background:var(--accent); border-radius:4px 4px 0 0; min-height:2px; opacity:${m.total===0?0.15:0.85}; transition:opacity 0.2s;"></div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size:9px; color:var(--fg-dim); letter-spacing:0.05em; text-transform: uppercase;">${monthLabel}${yearLabel}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // --- Top clients (par CA encaissé) ---
+      const clientTotals = {};
+      allInvoices.forEach(inv => {
+        const key = inv.client_name;
+        if (!clientTotals[key]) clientTotals[key] = { name: key, total: 0, invoices: 0 };
+        clientTotals[key].total += Number(inv.amount_paid);
+        clientTotals[key].invoices += 1;
+      });
+      const topClients = Object.values(clientTotals).sort((a, b) => b.total - a.total).slice(0, 5);
+      if (topClients.length === 0) {
+        $('top-clients').innerHTML = '<div class="empty" style="padding: 20px; font-size: 12px;">Aucun client encore. Crée ta première facture !</div>';
+      } else {
+        const maxClient = topClients[0].total || 1;
+        $('top-clients').innerHTML = topClients.map((c, i) => {
+          const pct = Math.round((c.total / maxClient) * 100);
+          return `
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
+                <span style="font-size: 13px; font-weight: 500;">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '  '} ${escapeHtml(c.name)}</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #10b981; font-weight: 600;">${formatCurrency(c.total, 'XOF')}</span>
+              </div>
+              <div style="background: rgba(200,116,58,0.15); height: 5px; border-radius: 3px; overflow: hidden;">
+                <div style="background: linear-gradient(90deg, #10b981, var(--accent)); width: ${pct}%; height: 100%; border-radius: 3px;"></div>
+              </div>
+              <div style="font-size: 10px; color: var(--fg-dim); margin-top: 3px; font-family: 'JetBrains Mono', monospace;">${c.invoices} facture${c.invoices>1?'s':''}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // --- Pipeline (devis envoyés) ---
+      if (devisEnvoyes.length === 0) {
+        $('pipeline').innerHTML = '<div class="empty" style="padding: 20px; font-size: 12px;">Aucun devis en attente de réponse.</div>';
+      } else {
+        const pipelineTotal = devisEnvoyes.reduce((s, q) => s + Number(q.total), 0);
+        $('pipeline').innerHTML = `
+          <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 11px; color: var(--fg-dim); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em;">
+            POTENTIEL : <strong style="color: var(--accent); font-size: 14px;">${formatCurrency(pipelineTotal, 'XOF')}</strong>
+          </div>
+          ${devisEnvoyes.slice(0, 6).map(q => {
+            const days = Math.floor((now - new Date(q.updated_at || q.created_at)) / dayMs);
+            return `
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px;">
+                <div style="min-width: 0; flex: 1;">
+                  <div style="font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(q.client_name)}</div>
+                  <div style="font-size: 10px; color: ${days >= 7 ? '#ef4444' : 'var(--fg-dim)'}; font-family: 'JetBrains Mono', monospace;">il y a ${days}j</div>
+                </div>
+                <div style="text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); white-space: nowrap; margin-left: 8px;">
+                  ${formatCurrency(Number(q.total), q.currency)}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        `;
+      }
+    }
+
+    $('refresh-dashboard').addEventListener('click', async () => {
+      await Promise.all([loadMessages(), loadQuotes(), loadProjects(), loadInvoices()]);
+      renderDashboard();
+    });
+
+    // Re-render dashboard quand l'onglet est cliqué (au cas où des données changent)
+    document.querySelector('[data-tab="dashboard"]').addEventListener('click', renderDashboard);
+
+    // ========== INVOICES (Factures) ==========
+    const PAYMENT_STATUS_LABELS = {
+      pending: 'À payer',
+      partial: 'Partiel',
+      paid: 'Payée',
+      overdue: 'En retard',
+      cancelled: 'Annulée'
+    };
+    const PAYMENT_METHOD_LABELS = {
+      wave: '💙 Wave',
+      orange_money: '🟠 Orange Money',
+      cash: '💵 Espèces',
+      virement: '🏦 Virement',
+      cheque: '📝 Chèque',
+      autre: '❓ Autre'
+    };
+
+    let allInvoices = [];
+    let allPaymentsByInvoice = {};
+    let invoiceFilter = 'all';
+
+    async function loadInvoices() {
+      $('invoices-list').innerHTML = '<div class="loading">CHARGEMENT…</div>';
+      const [invRes, payRes] = await Promise.all([
+        supabase.from('invoices').select('*').order('created_at', { ascending: false }),
+        supabase.from('payments').select('*').order('received_at', { ascending: false }),
+      ]);
+      if (invRes.error) {
+        $('invoices-list').innerHTML = `<div class="empty">Erreur : ${escapeHtml(invRes.error.message)}</div>`;
+        return;
+      }
+      allInvoices = invRes.data || [];
+      allPaymentsByInvoice = {};
+      (payRes.data || []).forEach(p => {
+        if (!allPaymentsByInvoice[p.invoice_id]) allPaymentsByInvoice[p.invoice_id] = [];
+        allPaymentsByInvoice[p.invoice_id].push(p);
+      });
+      renderInvoiceStats();
+      renderInvoices();
+    }
+
+    function renderInvoiceStats() {
+      const counts = { all: allInvoices.length };
+      for (const s of Object.keys(PAYMENT_STATUS_LABELS)) counts[s] = 0;
+      let caEncaissé = 0;
+      let enAttente = 0;
+      for (const inv of allInvoices) {
+        counts[inv.payment_status] = (counts[inv.payment_status] || 0) + 1;
+        caEncaissé += Number(inv.amount_paid || 0);
+        enAttente += Number(inv.total || 0) - Number(inv.amount_paid || 0);
+      }
+
+      const items = [
+        { key: 'all', label: 'Total', count: counts.all },
+        { key: 'pending', label: '⏳ À payer', count: counts.pending },
+        { key: 'partial', label: '⌛ Partiel', count: counts.partial },
+        { key: 'paid', label: '✓ Payées', count: counts.paid },
+        { key: 'overdue', label: '⚠️ Retard', count: counts.overdue },
+      ];
+      $('stats-invoices').innerHTML = items.map(it => `
+        <div class="stat ${invoiceFilter === it.key ? 'is-active' : ''}" data-filter="${it.key}">
+          <div class="stat__label">${it.label}</div>
+          <div class="stat__value">${it.count}</div>
+        </div>
+      `).join('') + `
+        <div class="stat" style="cursor:default; border-color: #10b981;">
+          <div class="stat__label" style="color:#10b981;">💰 CA encaissé</div>
+          <div class="stat__value" style="font-size:17px; color:#10b981;">${formatCurrency(caEncaissé, 'XOF')}</div>
+        </div>
+        <div class="stat" style="cursor:default; ${enAttente > 0 ? 'border-color: var(--accent);' : ''}">
+          <div class="stat__label">⏳ En attente</div>
+          <div class="stat__value" style="font-size:17px; color: var(--accent);">${formatCurrency(enAttente, 'XOF')}</div>
+        </div>
+      `;
+      $('stats-invoices').querySelectorAll('[data-filter]').forEach(el => {
+        el.addEventListener('click', () => {
+          invoiceFilter = el.dataset.filter;
+          renderInvoiceStats();
+          renderInvoices();
+        });
+      });
+    }
+
+    function renderInvoices() {
+      const filtered = invoiceFilter === 'all' ? allInvoices : allInvoices.filter(i => i.payment_status === invoiceFilter);
+      $('invoice-count').textContent = filtered.length === 0 ? 'Aucune' : `${filtered.length} facture${filtered.length>1?'s':''}`;
+      if (filtered.length === 0) {
+        $('invoices-list').innerHTML = `
+          <div class="empty">
+            ${allInvoices.length === 0
+              ? 'Aucune facture pour l\'instant. Va dans <strong>📄 Devis</strong>, mets un devis en statut « Accepté », puis clique « 💰 Créer la facture ».'
+              : 'Aucune facture pour ce filtre.'}
+          </div>`;
+        return;
+      }
+      $('invoices-list').innerHTML = filtered.map(inv => {
+        const payments = allPaymentsByInvoice[inv.id] || [];
+        const remaining = Number(inv.total) - Number(inv.amount_paid);
+        const progress = inv.total > 0 ? Math.min(100, (inv.amount_paid / inv.total) * 100) : 0;
+        const statusColors = {
+          paid: '#10b981',
+          partial: '#f59e0b',
+          pending: '#6b7280',
+          overdue: '#ef4444',
+          cancelled: '#9ca3af',
+        };
+        return `
+          <div class="quote">
+            <div class="quote__head">
+              <div>
+                <div class="quote__num">💰 ${escapeHtml(inv.invoice_number)}</div>
+                <div class="quote__client">${escapeHtml(inv.client_name)}</div>
+                <div style="font-size:13px; color:var(--fg-dim); margin-top:4px;">Émise le ${formatDate(inv.issue_date)} · Échéance ${formatDate(inv.due_date)}</div>
+              </div>
+              <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                <div class="quote__amount">${formatCurrency(inv.total, inv.currency)}</div>
+                <span class="pill" style="background: ${statusColors[inv.payment_status]}22; color: ${statusColors[inv.payment_status]};">${PAYMENT_STATUS_LABELS[inv.payment_status]}</span>
+              </div>
+            </div>
+
+            <!-- Barre de progression paiement -->
+            <div style="margin: 12px 0;">
+              <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--fg-dim); margin-bottom:6px; font-family: var(--f-mono); letter-spacing:0.05em;">
+                <span>Reçu : <strong style="color:#10b981;">${formatCurrency(inv.amount_paid, inv.currency)}</strong></span>
+                <span>Reste : <strong style="color:${remaining > 0 ? 'var(--accent)' : '#10b981'};">${formatCurrency(Math.max(0, remaining), inv.currency)}</strong></span>
+              </div>
+              <div style="height:8px; background: var(--bg); border-radius: 100px; overflow: hidden;">
+                <div style="height:100%; width:${progress}%; background: linear-gradient(90deg, #10b981, ${progress >= 100 ? '#10b981' : 'var(--accent)'}); transition: width 0.4s;"></div>
+              </div>
+            </div>
+
+            ${payments.length > 0 ? `
+              <details style="margin-top: 8px; padding: 10px; background: var(--bg); border-radius: 6px; font-size: 12px;">
+                <summary style="cursor:pointer; color: var(--accent); font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;">📋 ${payments.length} versement${payments.length>1?'s':''}</summary>
+                <div style="margin-top: 10px;">
+                  ${payments.map(p => `
+                    <div style="display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid var(--line); font-size:12px;">
+                      <span>${PAYMENT_METHOD_LABELS[p.method] || p.method}${p.reference ? ' · <code style="color:var(--fg-dim);">' + escapeHtml(p.reference) + '</code>' : ''}</span>
+                      <span><strong style="color:#10b981;">${formatCurrency(p.amount, inv.currency)}</strong> · ${formatDate(p.received_at)} <button data-delete-payment="${p.id}" style="margin-left:8px; background:none; border:none; color: #ef4444; cursor: pointer; font-size: 11px;">✕</button></span>
+                    </div>
+                  `).join('')}
+                </div>
+              </details>
+            ` : ''}
+
+            <div class="quote__actions" style="margin-top: 14px;">
+              ${remaining > 0 && inv.payment_status !== 'cancelled' ? `
+                <button class="quote__view-btn" data-record-payment="${inv.id}" style="background:#10b981;">+ Enregistrer un paiement</button>
+              ` : ''}
+              <a class="quote__view-btn" href="invoice-print.html?id=${inv.id}" target="_blank">👁 Aperçu / PDF</a>
+              ${whatsappBtn(
+                inv.client_phone,
+                inv.payment_status === 'paid'
+                  ? `Bonjour ${inv.client_name},\n\nVoici votre facture acquittée n° ${inv.invoice_number} d'un montant de ${formatCurrency(Number(inv.total), inv.currency)}.\n\nMerci infiniment pour votre confiance !\n\nBaye Dame`
+                  : remaining > 0 && Number(inv.amount_paid) > 0
+                    ? `Bonjour ${inv.client_name},\n\nPetit rappel concernant la facture n° ${inv.invoice_number} :\n— Total : ${formatCurrency(Number(inv.total), inv.currency)}\n— Déjà reçu : ${formatCurrency(Number(inv.amount_paid), inv.currency)}\n— Reste à payer : ${formatCurrency(remaining, inv.currency)}\n\nÉchéance : ${formatDate(inv.due_date)}.\n\nCordialement,\nBaye Dame`
+                    : `Bonjour ${inv.client_name},\n\nVoici votre facture n° ${inv.invoice_number} d'un montant de ${formatCurrency(Number(inv.total), inv.currency)}, à régler avant le ${formatDate(inv.due_date)}.\n\nMéthodes de paiement : Wave, Orange Money, virement bancaire.\n\nMerci,\nBaye Dame`,
+                inv.payment_status === 'paid' ? '📱 Envoyer reçu' : '📱 Relancer'
+              )}
+              ${inv.payment_status !== 'cancelled' ? `<button class="quote__edit-btn" data-cancel-invoice="${inv.id}">⊘ Annuler</button>` : ''}
+              <button class="quote__delete" data-delete-invoice="${inv.id}">Supprimer</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Wire up actions
+      $('invoices-list').querySelectorAll('[data-record-payment]').forEach(btn => {
+        btn.addEventListener('click', () => openPaymentModal(btn.dataset.recordPayment));
+      });
+      $('invoices-list').querySelectorAll('[data-delete-payment]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          if (!confirm('Supprimer ce versement ? Le statut paiement sera recalculé.')) return;
+          const { error } = await supabase.from('payments').delete().eq('id', btn.dataset.deletePayment);
+          if (error) return alert('Erreur : ' + error.message);
+          await loadInvoices();
+        });
+      });
+      $('invoices-list').querySelectorAll('[data-cancel-invoice]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Annuler cette facture ?')) return;
+          const { error } = await supabase.from('invoices').update({ payment_status: 'cancelled' }).eq('id', btn.dataset.cancelInvoice);
+          if (error) return alert('Erreur : ' + error.message);
+          await loadInvoices();
+        });
+      });
+      $('invoices-list').querySelectorAll('[data-delete-invoice]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Supprimer cette facture définitivement ? Tous ses versements seront aussi supprimés.')) return;
+          const { error } = await supabase.from('invoices').delete().eq('id', btn.dataset.deleteInvoice);
+          if (error) return alert('Erreur : ' + error.message);
+          await loadInvoices();
+        });
+      });
+    }
+
+    async function createInvoiceFromQuote(quoteId) {
+      const quote = allQuotes.find(q => q.id === quoteId);
+      if (!quote) return alert('Devis introuvable');
+      if (!confirm(`Créer une facture officielle à partir du devis ${quote.quote_number} ?\n\nLa facture reprendra les infos client, prestations et montants.`)) return;
+
+      const payload = {
+        quote_id: quote.id,
+        client_name: quote.client_name,
+        client_email: quote.client_email,
+        client_phone: quote.client_phone,
+        client_address: quote.client_address,
+        issue_date: new Date().toISOString().slice(0, 10),
+        due_date: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+        items: quote.items,
+        subtotal: quote.subtotal,
+        vat_rate: quote.vat_rate,
+        vat_amount: quote.vat_amount,
+        total: quote.total,
+        currency: quote.currency,
+        payment_terms: quote.payment_terms,
+        notes: quote.notes,
+      };
+      const { data, error } = await supabase.from('invoices').insert(payload).select().single();
+      if (error) return alert('Erreur : ' + error.message);
+      alert(`✓ Facture ${data.invoice_number} créée. Va dans l'onglet 💰 Factures pour l'éditer ou enregistrer un paiement.`);
+      // Bascule vers l'onglet Factures
+      document.querySelector('[data-tab="invoices"]').click();
+    }
+
+    function openPaymentModal(invoiceId) {
+      const inv = allInvoices.find(i => i.id === invoiceId);
+      if (!inv) return;
+      const remaining = Number(inv.total) - Number(inv.amount_paid);
+      $('pay-invoice-id').value = invoiceId;
+      $('pay-amount').value = remaining > 0 ? Math.round(remaining) : '';
+      $('pay-amount').max = remaining;
+      $('pay-date').value = new Date().toISOString().slice(0, 10);
+      $('pay-method').value = 'wave';
+      $('pay-reference').value = '';
+      $('pay-notes').value = '';
+      $('pay-context').innerHTML = `
+        <strong style="color:var(--fg);">${escapeHtml(inv.invoice_number)} · ${escapeHtml(inv.client_name)}</strong><br>
+        Total facture : <strong style="color:var(--accent);">${formatCurrency(inv.total, inv.currency)}</strong> ·
+        Déjà reçu : <strong style="color:#10b981;">${formatCurrency(inv.amount_paid, inv.currency)}</strong><br>
+        <strong style="color: ${remaining > 0 ? 'var(--accent)' : '#10b981'};">Reste à payer : ${formatCurrency(Math.max(0, remaining), inv.currency)}</strong>
+      `;
+      $('payment-modal').classList.add('is-visible');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePaymentModal() {
+      $('payment-modal').classList.remove('is-visible');
+      document.body.style.overflow = '';
+    }
+
+    $('payment-modal-close').addEventListener('click', closePaymentModal);
+    $('payment-cancel').addEventListener('click', closePaymentModal);
+    $('payment-modal').addEventListener('click', (e) => {
+      if (e.target === $('payment-modal')) closePaymentModal();
+    });
+
+    $('payment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        invoice_id: $('pay-invoice-id').value,
+        amount: parseFloat($('pay-amount').value),
+        method: $('pay-method').value,
+        received_at: $('pay-date').value,
+        reference: $('pay-reference').value.trim() || null,
+        notes: $('pay-notes').value.trim() || null,
+      };
+      const { error } = await supabase.from('payments').insert(payload);
+      if (error) return alert('Erreur : ' + error.message);
+      closePaymentModal();
+      await loadInvoices();
+    });
+
+    $('refresh-invoices').addEventListener('click', loadInvoices);
+
+    // Charge les factures quand on clique l'onglet
+    document.querySelector('[data-tab="invoices"]').addEventListener('click', loadInvoices);
+
+    // ========== SETTINGS (Notifications Telegram) ==========
+    async function loadSettings() {
+      $('settings-loading').classList.remove('hidden');
+      $('settings-form').classList.add('hidden');
+
+      const { data, error } = await supabase
+        .from('notification_settings')
+        .select('*')
+        .eq('id', 1)
+        .maybeSingle();
+
+      $('settings-loading').classList.add('hidden');
+      $('settings-form').classList.remove('hidden');
+
+      if (error) {
+        $('settings-msg').style.display = 'block';
+        $('settings-msg').style.background = 'rgba(239,68,68,0.1)';
+        $('settings-msg').style.color = '#ef4444';
+        $('settings-msg').textContent = 'Erreur de chargement : ' + error.message;
+        return;
+      }
+      if (data) {
+        $('telegram-token').value = data.telegram_bot_token || '';
+        $('telegram-chat-id').value = data.telegram_chat_id || '';
+        $('notif-enabled').checked = data.enabled;
+        $('notif-contact').checked = data.notify_contact_message;
+        $('notif-testimonial').checked = data.notify_testimonial;
+        $('notif-comment').checked = data.notify_client_comment;
+        $('notif-quote').checked = data.notify_quote_status;
+      }
+    }
+
+    function showSettingsMsg(text, kind = 'ok') {
+      const el = $('settings-msg');
+      el.style.display = 'block';
+      el.textContent = text;
+      if (kind === 'ok') {
+        el.style.background = 'rgba(16,185,129,0.1)';
+        el.style.color = '#10b981';
+        el.style.border = '1px solid #10b981';
+      } else {
+        el.style.background = 'rgba(239,68,68,0.1)';
+        el.style.color = '#ef4444';
+        el.style.border = '1px solid #ef4444';
+      }
+      setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+
+    $('settings-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      $('settings-save').disabled = true;
+      $('settings-save').textContent = 'Sauvegarde…';
+      const payload = {
+        telegram_bot_token: $('telegram-token').value.trim() || null,
+        telegram_chat_id: $('telegram-chat-id').value.trim() || null,
+        enabled: $('notif-enabled').checked,
+        notify_contact_message: $('notif-contact').checked,
+        notify_testimonial: $('notif-testimonial').checked,
+        notify_client_comment: $('notif-comment').checked,
+        notify_quote_status: $('notif-quote').checked,
+      };
+      const { error } = await supabase
+        .from('notification_settings')
+        .update(payload)
+        .eq('id', 1);
+
+      $('settings-save').disabled = false;
+      $('settings-save').textContent = '💾 Sauvegarder';
+
+      if (error) {
+        showSettingsMsg('Erreur : ' + error.message, 'err');
+      } else {
+        showSettingsMsg('✓ Réglages sauvegardés.', 'ok');
+      }
+    });
+
+    $('settings-test').addEventListener('click', async () => {
+      const token = $('telegram-token').value.trim();
+      const chatId = $('telegram-chat-id').value.trim();
+      if (!token || !chatId) {
+        showSettingsMsg('Remplis d\'abord Bot Token et Chat ID.', 'err');
+        return;
+      }
+      $('settings-test').disabled = true;
+      $('settings-test').textContent = 'Envoi…';
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: '✅ <b>Test réussi !</b>\n\nTon admin Baye Dame est bien connecté à Telegram. Tu recevras désormais une notif à chaque message client, témoignage, retour projet ou devis accepté.',
+            parse_mode: 'HTML',
+          })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showSettingsMsg('✓ Message envoyé ! Regarde ton Telegram.', 'ok');
+        } else {
+          showSettingsMsg('Erreur Telegram : ' + (data.description || 'inconnu'), 'err');
+        }
+      } catch (err) {
+        showSettingsMsg('Erreur : ' + err.message, 'err');
+      } finally {
+        $('settings-test').disabled = false;
+        $('settings-test').textContent = '📤 Envoyer un test';
+      }
+    });
+
+    // ========== INIT ==========
+    // Charge les settings quand l'onglet est cliqué
+    document.querySelector('[data-tab="settings"]').addEventListener('click', () => {
+      loadSettings();
+    });
+
+    checkAuth();
+  </script>
+</body>
+</html>

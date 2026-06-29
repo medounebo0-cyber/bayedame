@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Édition de projet — Admin Baye Dame</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0709;
+      --bg-alt: #1a0e0a;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --fg: #fafafa;
+      --fg-dim: #a8a29e;
+      --accent: #f97316;
+      --accent-2: #fb923c;
+      --accent-3: #c2410c;
+      --accent-soft: rgba(249, 115, 22, 0.12);
+      --line: rgba(255, 255, 255, 0.08);
+      --line-strong: rgba(255, 255, 255, 0.18);
+      --glass-bg: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.10);
+      --glass-shine: rgba(255, 255, 255, 0.18);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 10% 0%, rgba(249, 115, 22, 0.14), transparent 60%),
+        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(99, 102, 241, 0.08), transparent 60%);
+    }
+    .topbar, .container { position: relative; z-index: 2; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button { font-family: inherit; cursor: pointer; }
+
+    .topbar {
+      margin: 14px;
+      padding: 14px 26px;
+      border-radius: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    .topbar__left { display: flex; align-items: center; gap: 12px; }
+    .topbar__left strong {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      font-style: italic;
+    }
+    .topbar__right { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .btn {
+      padding: 9px 18px;
+      border-radius: 100px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--fg);
+      font-size: 13px;
+      transition: background 0.2s, border-color 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--line-strong); text-decoration: none; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-2), var(--accent), var(--accent-3));
+      color: var(--bg);
+      border: none;
+      font-weight: 600;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 4px 14px rgba(249, 115, 22, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, var(--accent-2), var(--accent), var(--accent-3));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 10px 24px rgba(249, 115, 22, 0.5);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 32px;
+    }
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; padding: 20px; gap: 20px; }
+    }
+
+    .col-main, .col-side { display: flex; flex-direction: column; gap: 20px; }
+
+    .card {
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 26px;
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 8px 28px rgba(0, 0, 0, 0.28);
+    }
+    .card__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+    .card__title {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .card__sub { font-size: 12px; color: var(--fg-dim); }
+
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--fg-dim);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 13px;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.05); }
+    .field textarea { resize: vertical; min-height: 70px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
+
+    /* DELIVERABLES */
+    .deliverable {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+    .deliverable:hover { border-color: rgba(249, 115, 22, 0.25); }
+    .deliverable__head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .deliverable__type {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .type-video { background: rgba(59,130,246,0.15); color: #3b82f6; }
+    .type-gallery { background: rgba(168,85,247,0.15); color: #a855f7; }
+    .type-download { background: rgba(16,185,129,0.15); color: #10b981; }
+    .type-note { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .deliverable__title { font-weight: 600; font-size: 15px; }
+    .deliverable__url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--fg-dim);
+      word-break: break-all;
+      margin-top: 4px;
+    }
+    .deliverable__desc {
+      font-size: 13px;
+      color: var(--fg-dim);
+      margin: 8px 0;
+      font-style: italic;
+    }
+    .deliverable__actions {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 12px;
+      border-radius: 100px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--fg);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-sm:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--line-strong); }
+    .btn-del { color: #ef4444; border-color: rgba(239,68,68,0.4); }
+    .btn-del:hover { background: rgba(239,68,68,0.1); }
+
+    /* ADD DELIVERABLE FORM */
+    .add-form {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed var(--glass-border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 12px;
+    }
+
+    /* COMMENTS */
+    .comment {
+      padding: 14px 16px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      border-left: 3px solid var(--accent);
+    }
+    .comment--client { border-left-color: #6366f1; background: rgba(99, 102, 241, 0.06); }
+    .comment--admin { border-left-color: var(--accent); background: rgba(249, 115, 22, 0.08); }
+    .comment--resolved { opacity: 0.6; border-left-color: var(--line-strong); }
+    .comment__head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 6px; gap: 12px;
+    }
+    .comment__author { font-weight: 600; font-size: 13px; }
+    .comment__author small {
+      font-weight: 400; color: var(--fg-dim);
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: 0.1em; margin-left: 6px;
+    }
+    .comment__date { font-size: 11px; color: var(--fg-dim); font-family: 'JetBrains Mono', monospace; }
+    .comment__body { font-size: 13px; white-space: pre-wrap; }
+    .comment__deliverable {
+      font-size: 11px; color: var(--fg-dim); margin-top: 6px;
+      font-style: italic;
+    }
+    .comment__actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+
+    .empty {
+      text-align: center; padding: 30px 20px; color: var(--fg-dim);
+      font-size: 13px;
+    }
+    .loading {
+      text-align: center; padding: 30px;
+      color: var(--fg-dim); font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; letter-spacing: 0.2em;
+    }
+    .hidden { display: none !important; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar__left">
+      <a href="admin.html">← Admin</a>
+      <strong id="project-title">Chargement…</strong>
+    </div>
+    <div class="topbar__right">
+      <span id="project-status" class="pill"></span>
+      <a id="public-link-btn" class="btn" target="_blank">👁 Voir comme le client</a>
+      <button id="copy-link-btn" class="btn">📋 Copier le lien</button>
+    </div>
+  </div>
+
+  <div id="loading" class="loading">CHARGEMENT DU PROJET…</div>
+
+  <div id="content" class="container hidden">
+    <!-- COLONNE PRINCIPALE : LIVRABLES -->
+    <div class="col-main">
+      <div class="card">
+        <div class="card__head">
+          <div>
+            <div class="card__title">📦 Livrables</div>
+            <div class="card__sub">Ce que le client va voir et pouvoir commenter</div>
+          </div>
+          <button class="btn btn-primary" id="show-add-form">+ Ajouter un livrable</button>
+        </div>
+
+        <!-- Form ajout livrable -->
+        <div class="add-form hidden" id="add-form">
+          <div class="field">
+            <label for="d-type">Type</label>
+            <select id="d-type">
+              <option value="video">🎬 Vidéo (YouTube / Vimeo)</option>
+              <option value="gallery">📷 Galerie photo (lien Drive, Dropbox, etc.)</option>
+              <option value="download">⬇️ Lien de téléchargement (WeTransfer, Drive…)</option>
+              <option value="note">📝 Note (info pour le client, sans lien)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="d-title">Titre *</label>
+            <input id="d-title" required maxlength="200" placeholder="Ex : Teaser v1 — Mariage Saly" />
+          </div>
+          <div class="field" id="d-url-field">
+            <label for="d-url">URL *</label>
+            <input id="d-url" maxlength="2000" placeholder="Ex : https://youtu.be/abc123 ou https://drive.google.com/..." />
+            <div class="card__sub" style="margin-top:4px;">Pour YouTube/Vimeo, colle juste l'URL normale, l'embed est auto-détecté.</div>
+          </div>
+          <div class="field">
+            <label for="d-desc">Description (optionnel)</label>
+            <textarea id="d-desc" maxlength="2000" placeholder="Ex : Version 1 du teaser, en attente de tes retours sur la musique et les transitions."></textarea>
+          </div>
+          <div style="display:flex; gap:8px; justify-content:flex-end;">
+            <button class="btn" id="cancel-add">Annuler</button>
+            <button class="btn btn-primary" id="save-deliverable">💾 Ajouter</button>
+          </div>
+        </div>
+
+        <div id="deliverables-list" style="margin-top:16px;"></div>
+      </div>
+    </div>
+
+    <!-- COLONNE LATÉRALE -->
+    <div class="col-side">
+      <!-- INFOS PROJET -->
+      <div class="card">
+        <div class="card__head">
+          <div class="card__title">ℹ️ Infos projet</div>
+        </div>
+        <div class="field">
+          <label>Lien à envoyer au client</label>
+          <input id="public-url" readonly style="font-family: 'JetBrains Mono', monospace; font-size: 11px;" />
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Client</label>
+            <div id="client-name-display" style="font-weight:500;"></div>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <div id="client-email-display" style="font-size:13px;color:var(--fg-dim);"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Description (visible par le client)</label>
+          <div id="description-display" style="font-size:13px; color:var(--fg-dim); padding:10px; background:var(--bg); border-radius:6px; white-space:pre-wrap;"></div>
+        </div>
+        <a class="btn" href="admin.html" style="width: 100%; text-align:center;">⚙ Modifier les infos sur Admin</a>
+      </div>
+
+      <!-- COMMENTAIRES -->
+      <div class="card">
+        <div class="card__head">
+          <div>
+            <div class="card__title">💬 Commentaires</div>
+            <div class="card__sub" id="comment-stats">—</div>
+          </div>
+        </div>
+        <div id="comments-list">
+          <div class="empty">Aucun commentaire pour l'instant.</div>
+        </div>
+        <!-- Réponse admin -->
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line);">
+          <div class="field">
+            <label for="admin-reply">Répondre / commenter (Baye Dame)</label>
+            <textarea id="admin-reply" rows="3" placeholder="Ex : Bien noté, je modifie la musique et te renvoie une v2 demain."></textarea>
+          </div>
+          <button class="btn btn-primary" id="post-reply">📤 Publier</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = 'https://bsaswpsgufyamrnrfkvw.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_E-e-dFA7UfXdZgiRL0jr5A_gVtCfjjl';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const PROJECT_STATUS_LABELS = {
+      in_progress: 'En cours',
+      review: 'À valider',
+      approved: 'Validé',
+      archived: 'Archivé'
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const projectId = params.get('id');
+    let currentProject = null;
+    let currentDeliverables = [];
+    let currentComments = [];
+
+    const $ = id => document.getElementById(id);
+
+    function escHtml(s) {
+      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+    function formatDateTime(d) {
+      if (!d) return '';
+      return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Convertir URL YouTube/Vimeo en URL embed
+    function toEmbedUrl(url) {
+      if (!url) return null;
+      // YouTube watch?v=
+      let m = url.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
+      if (m) return `https://www.youtube.com/embed/${m[1]}`;
+      // youtu.be/
+      m = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+      if (m) return `https://www.youtube.com/embed/${m[1]}`;
+      // YouTube shorts
+      m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
+      if (m) return `https://www.youtube.com/embed/${m[1]}`;
+      // YouTube embed direct
+      m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+      if (m) return `https://www.youtube.com/embed/${m[1]}`;
+      // Vimeo
+      m = url.match(/vimeo\.com\/(\d+)/);
+      if (m) return `https://player.vimeo.com/video/${m[1]}`;
+      return null;
+    }
+
+    // ===== AUTH =====
+    async function requireAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'admin.html';
+        return false;
+      }
+      return true;
+    }
+
+    // ===== LOAD PROJECT =====
+    async function loadProject() {
+      if (!projectId) {
+        $('loading').textContent = 'Projet introuvable.';
+        return;
+      }
+      const { data: project, error } = await supabase
+        .from('client_projects')
+        .select('*')
+        .eq('id', projectId)
+        .single();
+      if (error || !project) {
+        $('loading').textContent = 'Erreur : ' + (error?.message || 'Projet introuvable');
+        return;
+      }
+      currentProject = project;
+      renderProjectHead();
+
+      // Load deliverables & comments en parallèle
+      const [delivResult, commResult] = await Promise.all([
+        supabase.from('project_deliverables').select('*').eq('project_id', projectId).order('display_order'),
+        supabase.from('project_comments').select('*').eq('project_id', projectId).order('created_at')
+      ]);
+
+      currentDeliverables = delivResult.data || [];
+      currentComments = commResult.data || [];
+
+      renderDeliverables();
+      renderComments();
+
+      $('loading').classList.add('hidden');
+      $('content').classList.remove('hidden');
+    }
+
+    function renderProjectHead() {
+      const p = currentProject;
+      document.title = `${p.title} — Admin`;
+      $('project-title').textContent = p.title;
+      const url = `${window.location.origin}/projet.html?p=${encodeURIComponent(p.slug)}`;
+      $('public-url').value = url;
+      $('public-link-btn').href = url;
+      const statusEl = $('project-status');
+      statusEl.textContent = PROJECT_STATUS_LABELS[p.status] || p.status;
+      statusEl.style.background = p.status === 'approved' ? 'rgba(16,185,129,0.15)' :
+                                  p.status === 'review' ? 'rgba(139,92,246,0.15)' :
+                                  p.status === 'archived' ? 'rgba(107,114,128,0.15)' :
+                                  'rgba(245,158,11,0.15)';
+      statusEl.style.color = p.status === 'approved' ? '#10b981' :
+                             p.status === 'review' ? '#8b5cf6' :
+                             p.status === 'archived' ? '#6b7280' :
+                             '#f59e0b';
+      $('client-name-display').textContent = p.client_name;
+      $('client-email-display').textContent = p.client_email || '—';
+      $('description-display').textContent = p.description || 'Aucune description.';
+    }
+
+    function renderDeliverables() {
+      if (currentDeliverables.length === 0) {
+        $('deliverables-list').innerHTML = '<div class="empty">Aucun livrable. Clique sur « Ajouter un livrable » pour commencer.</div>';
+        return;
+      }
+      $('deliverables-list').innerHTML = currentDeliverables.map(d => {
+        const typeLabels = { video: '🎬 Vidéo', gallery: '📷 Galerie', download: '⬇️ Téléchargement', note: '📝 Note' };
+        const embed = d.type === 'video' ? toEmbedUrl(d.url) : null;
+        return `
+          <div class="deliverable" data-id="${d.id}">
+            <div class="deliverable__head">
+              <div>
+                <span class="deliverable__type type-${d.type}">${typeLabels[d.type] || d.type}</span>
+                <div class="deliverable__title">${escHtml(d.title)}</div>
+              </div>
+            </div>
+            ${d.url ? `<div class="deliverable__url">🔗 ${escHtml(d.url)}</div>` : ''}
+            ${d.description ? `<div class="deliverable__desc">${escHtml(d.description)}</div>` : ''}
+            ${embed ? `
+              <div style="position:relative; aspect-ratio:16/9; border-radius:6px; overflow:hidden; margin-top:10px; background:#000;">
+                <iframe src="${embed}" style="position:absolute;inset:0;width:100%;height:100%;border:0;" allowfullscreen></iframe>
+              </div>
+            ` : ''}
+            <div class="deliverable__actions">
+              <button class="btn-sm" data-up="${d.id}" title="Monter">↑</button>
+              <button class="btn-sm" data-down="${d.id}" title="Descendre">↓</button>
+              <button class="btn-sm btn-del" data-del-deliv="${d.id}">Supprimer</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Move up/down
+      $('deliverables-list').querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => moveDeliverable(b.dataset.up, -1)));
+      $('deliverables-list').querySelectorAll('[data-down]').forEach(b => b.addEventListener('click', () => moveDeliverable(b.dataset.down, +1)));
+      $('deliverables-list').querySelectorAll('[data-del-deliv]').forEach(b => b.addEventListener('click', () => deleteDeliverable(b.dataset.delDeliv)));
+    }
+
+    async function moveDeliverable(id, direction) {
+      const idx = currentDeliverables.findIndex(d => d.id === id);
+      const swapIdx = idx + direction;
+      if (idx < 0 || swapIdx < 0 || swapIdx >= currentDeliverables.length) return;
+      const a = currentDeliverables[idx], b = currentDeliverables[swapIdx];
+      const tmp = a.display_order; a.display_order = b.display_order; b.display_order = tmp;
+      await Promise.all([
+        supabase.from('project_deliverables').update({ display_order: a.display_order }).eq('id', a.id),
+        supabase.from('project_deliverables').update({ display_order: b.display_order }).eq('id', b.id)
+      ]);
+      currentDeliverables.sort((x, y) => x.display_order - y.display_order);
+      renderDeliverables();
+    }
+
+    async function deleteDeliverable(id) {
+      if (!confirm('Supprimer ce livrable ? Les commentaires liés seront conservés.')) return;
+      const { error } = await supabase.from('project_deliverables').delete().eq('id', id);
+      if (error) return alert('Erreur : ' + error.message);
+      currentDeliverables = currentDeliverables.filter(d => d.id !== id);
+      renderDeliverables();
+    }
+
+    // ===== ADD DELIVERABLE =====
+    $('show-add-form').addEventListener('click', () => {
+      $('add-form').classList.toggle('hidden');
+      $('d-type').value = 'video';
+      $('d-title').value = '';
+      $('d-url').value = '';
+      $('d-desc').value = '';
+      updateUrlField();
+    });
+    $('cancel-add').addEventListener('click', () => $('add-form').classList.add('hidden'));
+
+    function updateUrlField() {
+      const type = $('d-type').value;
+      if (type === 'note') {
+        $('d-url-field').classList.add('hidden');
+      } else {
+        $('d-url-field').classList.remove('hidden');
+      }
+    }
+    $('d-type').addEventListener('change', updateUrlField);
+
+    $('save-deliverable').addEventListener('click', async () => {
+      const type = $('d-type').value;
+      const title = $('d-title').value.trim();
+      const url = $('d-url').value.trim();
+      const description = $('d-desc').value.trim();
+      if (!title) return alert('Donne un titre au livrable.');
+      if (type !== 'note' && !url) return alert('Une URL est requise pour ce type de livrable.');
+      const maxOrder = currentDeliverables.reduce((m, d) => Math.max(m, d.display_order), 0);
+      const payload = {
+        project_id: projectId,
+        type, title,
+        url: url || null,
+        description: description || null,
+        display_order: maxOrder + 1
+      };
+      const { data, error } = await supabase.from('project_deliverables').insert(payload).select().single();
+      if (error) return alert('Erreur : ' + error.message);
+      currentDeliverables.push(data);
+      $('add-form').classList.add('hidden');
+      renderDeliverables();
+    });
+
+    // ===== COMMENTS =====
+    function renderComments() {
+      const totalClient = currentComments.filter(c => c.author === 'client').length;
+      const unresolved = currentComments.filter(c => c.author === 'client' && !c.resolved).length;
+      $('comment-stats').textContent = `${currentComments.length} total · ${totalClient} client · ${unresolved} à traiter`;
+
+      if (currentComments.length === 0) {
+        $('comments-list').innerHTML = '<div class="empty">Aucun commentaire pour l\'instant.</div>';
+        return;
+      }
+      $('comments-list').innerHTML = currentComments.map(c => {
+        const deliv = c.deliverable_id ? currentDeliverables.find(d => d.id === c.deliverable_id) : null;
+        return `
+          <div class="comment comment--${c.author}${c.resolved ? ' comment--resolved' : ''}" data-id="${c.id}">
+            <div class="comment__head">
+              <div class="comment__author">
+                ${escHtml(c.author_name)}
+                <small>${c.author === 'client' ? 'CLIENT' : 'TOI'}</small>
+              </div>
+              <div class="comment__date">${formatDateTime(c.created_at)}</div>
+            </div>
+            <div class="comment__body">${escHtml(c.message)}</div>
+            ${deliv ? `<div class="comment__deliverable">↳ sur "${escHtml(deliv.title)}"</div>` : ''}
+            <div class="comment__actions">
+              ${c.author === 'client' && !c.resolved ? `<button class="btn-sm" data-resolve="${c.id}">✓ Marquer traité</button>` : ''}
+              ${c.author === 'client' && c.resolved ? `<button class="btn-sm" data-unresolve="${c.id}">↩ Remettre en attente</button>` : ''}
+              <button class="btn-sm btn-del" data-del-comment="${c.id}">Supprimer</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      $('comments-list').querySelectorAll('[data-resolve]').forEach(b => b.addEventListener('click', () => setCommentResolved(b.dataset.resolve, true)));
+      $('comments-list').querySelectorAll('[data-unresolve]').forEach(b => b.addEventListener('click', () => setCommentResolved(b.dataset.unresolve, false)));
+      $('comments-list').querySelectorAll('[data-del-comment]').forEach(b => b.addEventListener('click', () => deleteComment(b.dataset.delComment)));
+    }
+
+    async function setCommentResolved(id, resolved) {
+      const { error } = await supabase.from('project_comments').update({ resolved }).eq('id', id);
+      if (error) return alert('Erreur : ' + error.message);
+      const c = currentComments.find(x => x.id === id);
+      if (c) c.resolved = resolved;
+      renderComments();
+    }
+    async function deleteComment(id) {
+      if (!confirm('Supprimer ce commentaire ?')) return;
+      const { error } = await supabase.from('project_comments').delete().eq('id', id);
+      if (error) return alert('Erreur : ' + error.message);
+      currentComments = currentComments.filter(c => c.id !== id);
+      renderComments();
+    }
+
+    $('post-reply').addEventListener('click', async () => {
+      const message = $('admin-reply').value.trim();
+      if (!message) return;
+      const payload = {
+        project_id: projectId,
+        author: 'admin',
+        author_name: 'Baye Dame',
+        message
+      };
+      const { data, error } = await supabase.from('project_comments').insert(payload).select().single();
+      if (error) return alert('Erreur : ' + error.message);
+      currentComments.push(data);
+      $('admin-reply').value = '';
+      renderComments();
+    });
+
+    // ===== COPY LINK =====
+    $('copy-link-btn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText($('public-url').value);
+        $('copy-link-btn').textContent = '✓ Copié !';
+        setTimeout(() => { $('copy-link-btn').textContent = '📋 Copier le lien'; }, 1500);
+      } catch {
+        alert($('public-url').value);
+      }
+    });
+
+    // ===== INIT =====
+    (async () => {
+      if (!(await requireAuth())) return;
+      await loadProject();
+    })();
+  </script>
+</body>
+</html>

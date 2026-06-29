@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mentions légales — Baye Dame</title>
+  <meta name="description" content="Mentions légales et politique de confidentialité du portfolio de Baye Dame, vidéaste et photographe." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0709;
+      --bg-alt: #1a0e0a;
+      --fg: #fafafa;
+      --fg-dim: #a8a29e;
+      --accent: #f97316;
+      --accent-2: #fb923c;
+      --accent-3: #c2410c;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-strong: rgba(255, 255, 255, 0.18);
+      --glass-bg: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.10);
+      --glass-shine: rgba(255, 255, 255, 0.18);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    /* Blobs atmosphériques */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 50% 10%, rgba(249, 115, 22, 0.18), transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 90%, rgba(99, 102, 241, 0.10), transparent 60%);
+    }
+    /* Scan lines subtiles */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.04) 50%);
+      background-size: 100% 3px;
+    }
+    main, .topbar, .footer { position: relative; z-index: 2; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .topbar {
+      margin: 18px;
+      padding: 14px 28px;
+      border-radius: 100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .brand__logo {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: #0a0a0a;
+      display: grid; place-items: center;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic; font-weight: 500;
+      font-size: 18px;
+      position: relative;
+      border: 1px solid var(--line);
+    }
+    .brand__logo::after {
+      content: ''; position: absolute;
+      bottom: 6px; right: 6px;
+      width: 4px; height: 4px;
+      background: var(--accent); border-radius: 50%;
+    }
+    .brand__name {
+      font-family: 'Playfair Display', serif;
+      font-weight: 600; font-style: italic;
+      font-size: 20px; letter-spacing: -0.01em;
+    }
+    .brand__name em {
+      font-style: normal;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .back-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; letter-spacing: 0.15em;
+      color: var(--fg-dim);
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--accent); text-decoration: none; }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 60px 40px 100px;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: clamp(40px, 7vw, 72px);
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+    .hero-title em {
+      font-style: italic;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent), var(--accent-3));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .updated {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--fg-dim);
+      text-transform: uppercase;
+      margin-bottom: 60px;
+    }
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      font-size: 30px;
+      letter-spacing: -0.02em;
+      margin-top: 56px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    h2 .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      color: var(--bg);
+      font-weight: 600;
+      padding: 5px 12px;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      border-radius: 100px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 8px rgba(249,115,22,0.3);
+    }
+    h3 {
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      font-size: 17px;
+      margin-top: 28px;
+      margin-bottom: 12px;
+      color: var(--fg);
+    }
+    p { margin-bottom: 14px; color: var(--fg-dim); }
+    p strong, li strong { color: var(--fg); font-weight: 500; }
+
+    ul, ol {
+      margin-bottom: 16px;
+      padding-left: 0;
+      list-style: none;
+    }
+    ul li, ol li {
+      padding-left: 24px;
+      position: relative;
+      margin-bottom: 8px;
+      color: var(--fg-dim);
+    }
+    ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    ol {
+      counter-reset: ol-counter;
+    }
+    ol li {
+      counter-increment: ol-counter;
+    }
+    ol li::before {
+      content: counter(ol-counter) ".";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .box {
+      padding: 24px;
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        inset 0 1px 0 var(--glass-shine),
+        0 8px 24px rgba(0, 0, 0, 0.3);
+      border-radius: 16px;
+      margin: 18px 0 22px;
+    }
+    .box strong { color: var(--fg); }
+    .box p:last-child { margin-bottom: 0; }
+
+    .key {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 3px 9px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 5px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .footer {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 30px 40px 40px;
+      border-top: 1px solid var(--line);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--fg-dim);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .footer a { color: var(--accent); }
+
+    @media (max-width: 700px) {
+      .topbar { padding: 16px 20px; }
+      main { padding: 40px 20px 60px; }
+      .footer { padding: 24px 20px 30px; }
+      h2 { font-size: 24px; margin-top: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand__logo">BD</div>
+      <div class="brand__name">Baye <em>Dame</em></div>
+    </div>
+    <a class="back-link" href="index.html">← RETOUR AU SITE</a>
+  </header>
+
+  <main>
+    <h1 class="hero-title">Mentions <em>légales</em></h1>
+    <div class="updated">Mise à jour : 27 juin 2026</div>
+
+    <h2><span class="num">01</span> Éditeur du site</h2>
+    <div class="box">
+      <p>
+        <strong>Medoune Bo</strong> (nom d'artiste : Baye Dame)<br/>
+        Vidéaste &amp; Photographe — Travailleur indépendant<br/>
+        Guédiawaye, Dakar, Sénégal
+      </p>
+      <p>
+        Email : <a href="mailto:medounebo0@gmail.com">medounebo0@gmail.com</a><br/>
+        Téléphone : <a href="tel:+221773758392">+221 77 375 83 92</a><br/>
+        Instagram : <a href="https://instagram.com/_bayedame" target="_blank" rel="noopener">@_bayedame</a>
+      </p>
+      <p>
+        Directeur de la publication : Medoune Bo.
+      </p>
+    </div>
+
+    <h2><span class="num">02</span> Hébergeur</h2>
+    <p>
+      Le site est hébergé par <strong>Netlify, Inc.</strong><br/>
+      44 Montgomery Street, Suite 300, San Francisco, CA 94104, États-Unis.<br/>
+      Site web : <a href="https://www.netlify.com" target="_blank" rel="noopener">www.netlify.com</a>
+    </p>
+    <p>
+      La base de données et les services backend (formulaires, espaces clients, devis, témoignages) sont assurés par <strong>Supabase</strong> — Supabase Inc., 970 Toa Payoh North #07-04, Singapore 318992, avec des serveurs hébergés dans l'Union Européenne (Paris, France).
+    </p>
+
+    <h2><span class="num">03</span> Propriété intellectuelle</h2>
+    <p>
+      L'ensemble du contenu présent sur ce site (textes, photographies, vidéos, montages, illustrations, identité visuelle) est la propriété exclusive de <strong>Medoune Bo (Baye Dame)</strong>, sauf mention contraire.
+    </p>
+    <p>
+      Toute reproduction, représentation, modification, publication, transmission, exploitation, totale ou partielle, des contenus de ce site est <strong>strictement interdite</strong> sans autorisation écrite préalable.
+    </p>
+    <p>
+      Les marques, logos et noms commerciaux de tiers (clients, partenaires) éventuellement cités sur ce site restent la propriété de leurs détenteurs respectifs.
+    </p>
+
+    <h2><span class="num">04</span> Données personnelles collectées</h2>
+    <p>
+      Conformément à la <strong>Loi sénégalaise n° 2008-12 du 25 janvier 2008</strong> sur la protection des données à caractère personnel et au <strong>Règlement Général sur la Protection des Données (RGPD)</strong> de l'Union Européenne, voici les informations sur la collecte et l'usage de vos données.
+    </p>
+
+    <h3>Données collectées</h3>
+    <ul>
+      <li><strong>Formulaire de contact</strong> — nom, email, type de projet, message.</li>
+      <li><strong>Demande de devis</strong> — nom, email, téléphone (optionnel), adresse (optionnel), détails du projet.</li>
+      <li><strong>Témoignages clients</strong> — nom, contexte (rôle/profession), note, message.</li>
+      <li><strong>Espaces clients privés</strong> — nom du commentateur, message, identifiant technique du projet.</li>
+    </ul>
+
+    <h3>Finalités</h3>
+    <ul>
+      <li>Répondre à vos demandes commerciales et d'information.</li>
+      <li>Établir et envoyer des devis.</li>
+      <li>Suivre la production et la livraison de projets clients.</li>
+      <li>Afficher publiquement les témoignages que vous avez explicitement soumis (et que j'ai approuvés).</li>
+      <li>Améliorer mes services en analysant les retours reçus.</li>
+    </ul>
+
+    <h3>Bases légales</h3>
+    <p>
+      Le traitement de vos données repose sur <strong>votre consentement</strong> (formulaires que vous remplissez vous-même) et sur <strong>l'exécution de mesures précontractuelles</strong> (devis, projets) à votre demande.
+    </p>
+
+    <h3>Durée de conservation</h3>
+    <ul>
+      <li><strong>Messages de contact</strong> — conservés 3 ans après le dernier échange (ou jusqu'à demande de suppression).</li>
+      <li><strong>Devis et factures</strong> — conservés 10 ans (obligations comptables).</li>
+      <li><strong>Témoignages approuvés</strong> — conservés tant qu'ils sont publiés (suppression sur demande).</li>
+      <li><strong>Espaces clients</strong> — conservés pendant la durée du projet, puis archivés 2 ans avant suppression.</li>
+    </ul>
+
+    <h2><span class="num">05</span> Vos droits</h2>
+    <p>
+      Vous disposez à tout moment des droits suivants sur vos données personnelles :
+    </p>
+    <ul>
+      <li><strong>Droit d'accès</strong> — savoir quelles données je détiens sur vous.</li>
+      <li><strong>Droit de rectification</strong> — corriger des données inexactes.</li>
+      <li><strong>Droit à l'effacement</strong> — demander la suppression de vos données.</li>
+      <li><strong>Droit d'opposition</strong> — refuser que vos données soient traitées.</li>
+      <li><strong>Droit à la portabilité</strong> — recevoir vos données dans un format structuré.</li>
+      <li><strong>Droit de retirer votre consentement</strong> à tout moment, sans affecter la légalité du traitement passé.</li>
+    </ul>
+    <p>
+      Pour exercer ces droits, écrivez-moi à <a href="mailto:medounebo0@gmail.com">medounebo0@gmail.com</a>. Je m'engage à répondre sous <strong>30 jours maximum</strong>.
+    </p>
+
+    <h2><span class="num">06</span> Cookies &amp; technologies similaires</h2>
+    <p>
+      Ce site <strong>n'utilise pas de cookies de tracking, de publicité ou de marketing</strong>. Aucun cookie tiers (Google Analytics, Facebook Pixel, etc.) n'est déposé.
+    </p>
+    <p>Des technologies de stockage local sont utilisées uniquement à des fins techniques :</p>
+    <ul>
+      <li><span class="key">localStorage</span> — pour mémoriser votre prénom dans les espaces clients privés (afin de vous éviter de le retaper à chaque commentaire). Ces données restent sur votre appareil et ne sont jamais envoyées à un tiers.</li>
+      <li>Aucune session, aucun cookie de connexion n'est créé pour les visiteurs.</li>
+    </ul>
+
+    <h2><span class="num">07</span> Sous-traitants &amp; transferts</h2>
+    <p>Pour faire fonctionner le site, je m'appuie sur les services suivants :</p>
+    <div class="box">
+      <p><strong>Netlify, Inc.</strong> — hébergement du site (États-Unis). Pas de données personnelles transférées en dehors des connexions techniques (adresse IP, user-agent).</p>
+      <p><strong>Supabase</strong> — base de données pour les formulaires, devis, témoignages, espaces clients (serveurs en France, Union Européenne).</p>
+      <p><strong>Google (YouTube)</strong> — lecture des vidéos intégrées. Lorsque vous regardez une vidéo, YouTube peut déposer ses propres cookies. Voir la <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">politique de confidentialité de Google</a>.</p>
+      <p><strong>Google Fonts (CDN)</strong> — chargement des polices (Inter Tight, Playfair Display, JetBrains Mono). Votre adresse IP est transmise à Google pour cette seule requête.</p>
+    </div>
+
+    <h2><span class="num">08</span> Sécurité</h2>
+    <p>
+      Vos données sont protégées par <strong>Row Level Security (RLS)</strong> au niveau base de données : seul le propriétaire du site peut consulter les messages, devis, et témoignages en attente.
+    </p>
+    <p>
+      Les communications entre votre navigateur et le site sont chiffrées via <strong>HTTPS / TLS</strong>.
+    </p>
+    <p>
+      Aucun mot de passe client n'est conservé. Les espaces clients privés sont protégés par un identifiant aléatoire de 12 caractères (≈ 3 200 milliards de milliards de combinaisons possibles), envoyé uniquement à la personne concernée.
+    </p>
+
+    <h2><span class="num">09</span> Modifications</h2>
+    <p>
+      Ces mentions légales peuvent être mises à jour à tout moment pour refléter des changements légaux ou techniques. La date de mise à jour en haut de cette page indique la dernière révision.
+    </p>
+
+    <h2><span class="num">10</span> Contact</h2>
+    <p>
+      Pour toute question relative à ces mentions légales, à vos données personnelles, ou pour signaler un usage inapproprié de ce site, contactez-moi à <a href="mailto:medounebo0@gmail.com">medounebo0@gmail.com</a>.
+    </p>
+  </main>
+
+  <footer class="footer">
+    <span>© 2026 Baye Dame · Tous droits réservés</span>
+    <span><a href="index.html">bayedame.netlify.app</a></span>
+  </footer>
+
+  <script src="analytics.js" defer></script>
+</body>
+</html>
