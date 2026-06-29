@@ -5,6 +5,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    /* Active les effets cinéma (FX) avant le premier rendu — desktop + animations autorisées */
+    try {
+      if (window.matchMedia('(pointer: fine)').matches &&
+          !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('fx');
+      }
+    } catch (e) {}
+  </script>
   <title>Baye Dame — Vidéaste & Photographe</title>
   <meta name="description" content="Portfolio de Baye Dame, vidéaste et photographe basé à Dakar. Showreel, photographies, parcours et contact." />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />

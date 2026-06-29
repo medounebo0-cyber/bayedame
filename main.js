@@ -114,6 +114,80 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  /* ---------- FX CINÉMA (desktop + animations autorisées) ---------- */
+  const FX_OK = window.matchMedia('(pointer: fine)').matches
+             && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (FX_OK) {
+    document.documentElement.classList.add('fx');
+
+    /* a) Parallaxe souris sur le hero (le viseur et le texte bougent à des profondeurs différentes) */
+    const heroEl = document.querySelector('.hero');
+    const vfEl = document.querySelector('.vf');
+    const heroContentEl = document.querySelector('.hero__content');
+    if (heroEl && (vfEl || heroContentEl)) {
+      let px = 0, py = 0, tx = 0, ty = 0;
+      heroEl.addEventListener('mousemove', (e) => {
+        const r = heroEl.getBoundingClientRect();
+        tx = (e.clientX - r.left) / r.width - 0.5;   // -0.5 → 0.5
+        ty = (e.clientY - r.top) / r.height - 0.5;
+      }, { passive: true });
+      heroEl.addEventListener('mouseleave', () => { tx = 0; ty = 0; });
+      (function heroParallax() {
+        px += (tx - px) * 0.06;
+        py += (ty - py) * 0.06;
+        if (vfEl) vfEl.style.transform = `translate(${px * 20}px, ${py * 20}px)`;
+        if (heroContentEl) heroContentEl.style.transform = `translate(${px * -12}px, ${py * -9}px)`;
+        requestAnimationFrame(heroParallax);
+      })();
+    }
+
+    /* b) Cartes 3D + reflet lumineux qui suit le curseur */
+    document.querySelectorAll('.work__item, .photo__item').forEach(card => {
+      const sheen = document.createElement('span');
+      sheen.className = 'fx-sheen';
+      card.appendChild(sheen);
+
+      let raf = null, trx = 0, try_ = 0, crx = 0, cry = 0;
+      card.addEventListener('mousemove', (e) => {
+        const r = card.getBoundingClientRect();
+        const fx = (e.clientX - r.left) / r.width;   // 0 → 1
+        const fy = (e.clientY - r.top) / r.height;
+        try_ = (fx - 0.5) * 9;    // rotateY
+        trx = (0.5 - fy) * 9;     // rotateX
+        sheen.style.setProperty('--mx', (fx * 100) + '%');
+        sheen.style.setProperty('--my', (fy * 100) + '%');
+        if (!raf) raf = requestAnimationFrame(tick);
+      }, { passive: true });
+
+      function tick() {
+        crx += (trx - crx) * 0.2;
+        cry += (try_ - cry) * 0.2;
+        card.style.transform =
+          `perspective(1100px) rotateX(${crx.toFixed(2)}deg) rotateY(${cry.toFixed(2)}deg) translateY(-6px)`;
+        if (Math.abs(trx - crx) > 0.05 || Math.abs(try_ - cry) > 0.05) {
+          raf = requestAnimationFrame(tick);
+        } else { raf = null; }
+      }
+      card.addEventListener('mouseleave', () => {
+        trx = 0; try_ = 0;
+        if (raf) { cancelAnimationFrame(raf); raf = null; }
+        card.style.transform = '';   // la transition CSS ramène la carte en douceur
+      });
+    });
+
+    /* c) Boutons magnétiques (CTA principaux attirés par le curseur) */
+    document.querySelectorAll('.btn--primary').forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const r = btn.getBoundingClientRect();
+        const mx = (e.clientX - r.left - r.width / 2) / (r.width / 2);
+        const my = (e.clientY - r.top - r.height / 2) / (r.height / 2);
+        btn.style.transform = `translate(${(mx * 6).toFixed(1)}px, ${(my * 5).toFixed(1)}px)`;
+      }, { passive: true });
+      btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+    });
+  }
+
   /* ---------- SCROLL REVEAL ---------- */
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => {
