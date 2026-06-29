@@ -6,5 +6,6 @@ Disallow: /admin.html
 Disallow: /admin-project.html
 Disallow: /projet.html
 Disallow: /quote-print.html
+Disallow: /invoice-print.html
 
-Sitemap: https://bayedame.netlify.app/sitemap.xml
+Sitemap: https://bayedame.pages.dev/sitemap.xml
