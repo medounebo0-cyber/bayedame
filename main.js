@@ -184,8 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    /* c) Boutons magnétiques (CTA principaux attirés par le curseur) */
-    document.querySelectorAll('.btn--primary').forEach(btn => {
+    /* c) Boutons magnétiques (CTA attirés par le curseur) */
+    document.querySelectorAll('.btn--primary, .btn--ghost').forEach(btn => {
       btn.addEventListener('mousemove', (e) => {
         const r = btn.getBoundingClientRect();
         const mx = (e.clientX - r.left - r.width / 2) / (r.width / 2);
@@ -288,6 +288,9 @@ document.addEventListener('DOMContentLoaded', () => {
     io.observe(el);
   });
 
+  // Tuiles bento : révélées via leurs propres styles (.bento__tile), pas .fade-up
+  document.querySelectorAll('.bento__tile').forEach(el => io.observe(el));
+
   // Skill bars
   document.querySelectorAll('.cv__bar').forEach(bar => {
     const barObs = new IntersectionObserver((entries) => {
@@ -340,6 +343,16 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         item.classList.add('is-hidden');
       }
+    });
+  });
+
+  /* ---------- BENTO SERVICES → active le filtre Travaux correspondant ---------- */
+  // (le smooth-scroll vers #work est déjà géré globalement par les liens #ancre)
+  document.querySelectorAll('.bento__tile[data-wfilter]').forEach(tile => {
+    tile.addEventListener('click', () => {
+      const f = tile.dataset.wfilter;
+      const btn = document.querySelector(`.work__filter[data-wfilter="${f}"]`);
+      if (btn) btn.click();
     });
   });
 
@@ -621,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* ---------- BURGER MOBILE (simple smooth-scroll fallback) ---------- */
+  /* ---------- SMOOTH-SCROLL ancres internes ---------- */
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', (e) => {
       const id = a.getAttribute('href');
@@ -633,5 +646,94 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  /* ---------- MENU MOBILE (burger → overlay plein écran) ---------- */
+  const burger = document.querySelector('[data-burger]');
+  const navLinks = document.querySelector('[data-nav-links]');
+  if (burger && navLinks) {
+    // On construit un overlay séparé, rattaché au <body>, pour échapper au
+    // backdrop-filter de la barre nav (qui confinerait un position:fixed).
+    const menu = document.createElement('div');
+    menu.className = 'mobile-menu';
+    navLinks.querySelectorAll('a').forEach(a => {
+      const link = document.createElement('a');
+      link.href = a.getAttribute('href');
+      link.textContent = a.textContent.trim();
+      if (a.classList.contains('is-active')) link.classList.add('is-active');
+      if (a.classList.contains('nav__links-cv')) {
+        link.classList.add('mobile-menu__cv');
+        link.setAttribute('download', '');
+      }
+      menu.appendChild(link);
+    });
+    document.body.appendChild(menu);
+
+    const closeMenu = () => {
+      menu.classList.remove('is-open');
+      document.body.classList.remove('nav-open');
+      burger.setAttribute('aria-expanded', 'false');
+    };
+    burger.addEventListener('click', () => {
+      const open = !menu.classList.contains('is-open');
+      menu.classList.toggle('is-open', open);
+      document.body.classList.toggle('nav-open', open);
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    // Clic sur un lien : ancre interne → smooth-scroll + fermeture ; sinon on ferme
+    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', (e) => {
+      const href = a.getAttribute('href') || '';
+      if (href.startsWith('#') && href.length > 1) {
+        const t = document.querySelector(href);
+        if (t) { e.preventDefault(); closeMenu(); setTimeout(() => t.scrollIntoView({ behavior: 'smooth' }), 60); return; }
+      }
+      closeMenu();
+    }));
+    // Clic sur le fond (hors liens) : fermeture
+    menu.addEventListener('click', (e) => { if (e.target === menu) closeMenu(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+  }
+
+  /* ---------- ONGLETS PAGE TRAVAUX (Vidéos / Photos) + routage par hash ---------- */
+  const tabsEl = document.querySelector('[data-tabs]');
+  if (tabsEl) {
+    const tabs = tabsEl.querySelectorAll('.wtab');
+    const panels = document.querySelectorAll('.wpanel');
+    const VIDEO_FILTERS = ['clip-off', 'making', 'mariage', 'concert', 'event', 'corporate', 'doc'];
+
+    function activateTab(name) {
+      tabs.forEach(t => {
+        const on = t.dataset.tab === name;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      panels.forEach(p => {
+        const on = p.dataset.panel === name;
+        p.classList.toggle('is-active', on);
+        if (on) {
+          p.removeAttribute('hidden');
+          // L'IntersectionObserver ne se déclenche pas sur un panneau display:none —
+          // on révèle directement les items du panneau affiché.
+          p.querySelectorAll('.fade-up, .reveal').forEach(el => el.classList.add('is-visible'));
+        } else {
+          p.setAttribute('hidden', '');
+        }
+      });
+    }
+
+    tabs.forEach(t => t.addEventListener('click', () => {
+      activateTab(t.dataset.tab);
+      history.replaceState(null, '', t.dataset.tab === 'photos' ? '#photos' : '#videos');
+    }));
+
+    // Au chargement : ouvre le bon onglet/filtre selon le hash (#photos, #mariage, etc.)
+    const h = (location.hash || '').replace('#', '');
+    if (h === 'photos') {
+      activateTab('photos');
+    } else if (VIDEO_FILTERS.includes(h)) {
+      activateTab('videos');
+      const fbtn = document.querySelector(`.work__filter[data-wfilter="${h}"]`);
+      if (fbtn) fbtn.click();
+    }
+  }
 
 });

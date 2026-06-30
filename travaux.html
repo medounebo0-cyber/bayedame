@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    /* Active les effets cinéma (FX) avant le premier rendu — desktop + animations autorisées */
+    try {
+      if (window.matchMedia('(pointer: fine)').matches &&
+          !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('fx');
+      }
+    } catch (e) {}
+  </script>
+  <title>Travaux — Baye Dame | Vidéaste & Photographe à Dakar</title>
+  <meta name="description" content="Toutes les réalisations de Baye Dame : clips officiels, making-of, mariages, concerts, corporate, documentaires et photographies. Vidéaste et photographe basé à Dakar." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://bayedame.pages.dev/travaux.html" />
+  <meta property="og:title" content="Travaux — Baye Dame | Vidéaste & Photographe" />
+  <meta property="og:description" content="Toutes les réalisations vidéo et photo de Baye Dame : clips, mariages, concerts, corporate, documentaires." />
+  <meta property="og:image" content="https://bayedame.pages.dev/assets/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="fr_FR" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Travaux — Baye Dame | Vidéaste & Photographe" />
+  <meta name="twitter:description" content="Toutes les réalisations vidéo et photo de Baye Dame." />
+  <meta name="twitter:image" content="https://bayedame.pages.dev/assets/og-image.jpg" />
+
+  <meta name="keywords" content="travaux vidéaste Dakar, clips Sénégal, making-of, vidéo mariage Saly, aftermovie concert, corporate Dakar, photographe portrait, Baye Dame" />
+  <meta name="author" content="Medoune Bo (Baye Dame)" />
+  <link rel="canonical" href="https://bayedame.pages.dev/travaux.html" />
+
+  <!-- Fil d'Ariane structuré pour Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://bayedame.pages.dev/" },
+      { "@type": "ListItem", "position": 2, "name": "Travaux", "item": "https://bayedame.pages.dev/travaux.html" }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page--inner">
+
+  <!-- Lien d'évitement (clavier / lecteurs d'écran) -->
+  <a href="#travaux-top" class="skip-link">Aller au contenu</a>
+
+  <!-- BLOBS ATMOSPHÉRIQUES -->
+  <div class="warm-blobs" aria-hidden="true">
+    <div class="warm-blob warm-blob--1"></div>
+    <div class="warm-blob warm-blob--2"></div>
+    <div class="warm-blob warm-blob--3"></div>
+  </div>
+
+  <!-- GRAIN GLOBAL -->
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- BOUTON WHATSAPP FLOTTANT -->
+  <a
+    href="https://wa.me/221773758392?text=Bonjour%20Baye%20Dame%20%21%20Je%20viens%20de%20votre%20portfolio%20et%20j%27aimerais%20discuter%20d%27un%20projet."
+    target="_blank"
+    rel="noopener"
+    class="wa-fab"
+    aria-label="Écrivez-moi sur WhatsApp"
+    data-cursor-hover
+  >
+    <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
+      <path d="M16.003 0C7.17 0 .005 7.164.005 15.997c0 2.821.738 5.578 2.139 8.001L0 32l8.21-2.15c2.34 1.276 4.973 1.945 7.794 1.945 8.832 0 15.997-7.164 15.997-15.998C32 7.164 24.835 0 16.003 0zm0 29.295c-2.527 0-5.005-.679-7.166-1.962l-.514-.305-4.873 1.278 1.299-4.752-.335-.534a13.27 13.27 0 01-2.033-7.023C2.381 8.49 8.493 2.379 16.003 2.379c7.51 0 13.621 6.112 13.621 13.618 0 7.508-6.111 13.298-13.621 13.298zm7.466-9.94c-.41-.205-2.422-1.196-2.798-1.333-.376-.137-.65-.206-.923.206-.274.41-1.058 1.333-1.297 1.607-.238.274-.478.31-.888.103-.41-.205-1.733-.638-3.302-2.037-1.22-1.088-2.043-2.432-2.282-2.842-.238-.41-.025-.632.18-.836.184-.184.41-.479.615-.718.205-.24.274-.41.41-.684.137-.273.069-.513-.034-.718-.103-.205-.923-2.225-1.265-3.044-.333-.8-.673-.691-.923-.704l-.787-.014c-.273 0-.718.103-1.094.514-.376.41-1.436 1.402-1.436 3.418 0 2.017 1.471 3.965 1.676 4.239.205.273 2.893 4.42 7.012 6.197.98.423 1.745.676 2.341.865.984.313 1.879.269 2.587.163.789-.118 2.422-.99 2.764-1.946.342-.957.342-1.778.24-1.946-.103-.17-.376-.273-.787-.479z"/>
+    </svg>
+    <span class="wa-fab__label">Discutons sur WhatsApp</span>
+  </a>
+
+  <!-- CURSEUR CUSTOM -->
+  <div class="cursor" data-cursor></div>
+  <div class="cursor-dot" data-cursor-dot></div>
+
+  <!-- NAVIGATION -->
+  <header class="nav">
+    <a href="index.html" class="nav__logo" data-cursor-hover>BD<span>.</span></a>
+    <nav class="nav__links" data-nav-links>
+      <a href="index.html#services" data-cursor-hover>Services</a>
+      <a href="travaux.html" class="is-active" data-cursor-hover>Travaux</a>
+      <a href="index.html#cv" data-cursor-hover>Parcours</a>
+      <a href="index.html#contact" data-cursor-hover>Contact</a>
+      <a href="assets/cv/CV.pdf" class="nav__links-cv" download data-cursor-hover>Télécharger le CV ↓</a>
+    </nav>
+    <a href="assets/cv/CV.pdf" class="nav__cv" download data-cursor-hover>CV ↓</a>
+    <button class="nav__burger" data-burger aria-label="Menu" aria-expanded="false">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <!-- EN-TÊTE DE PAGE -->
+  <section class="page-head" id="travaux-top">
+    <nav class="breadcrumb" aria-label="Fil d'Ariane">
+      <a href="index.html" data-cursor-hover>Accueil</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Travaux</span>
+    </nav>
+    <h1 class="page-head__title"><em>Travaux</em></h1>
+    <p class="page-head__desc">L'ensemble de mes réalisations — vidéos et photographies. Filtrez par catégorie, cliquez pour découvrir en grand.</p>
+
+    <!-- ONGLETS Vidéos / Photos -->
+    <div class="wtabs" data-tabs role="tablist" aria-label="Type de travaux">
+      <button class="wtab is-active" data-tab="videos" role="tab" aria-selected="true" data-cursor-hover>
+        Vidéos <span class="wtab__count">14</span>
+      </button>
+      <button class="wtab" data-tab="photos" role="tab" aria-selected="false" data-cursor-hover>
+        Photos <span class="wtab__count">8</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- PANNEAU VIDÉOS -->
+  <section class="wpanel is-active work" data-panel="videos" id="videos" role="tabpanel">
+    <div class="work__filters" data-work-filters>
+      <button class="work__filter is-active" data-wfilter="all" data-cursor-hover>Tout</button>
+      <button class="work__filter" data-wfilter="clip-off" data-cursor-hover>Clip Officiel</button>
+      <button class="work__filter" data-wfilter="making" data-cursor-hover>Making-Of</button>
+      <button class="work__filter" data-wfilter="mariage" data-cursor-hover>Mariage</button>
+      <button class="work__filter" data-wfilter="concert" data-cursor-hover>Concert</button>
+      <button class="work__filter" data-wfilter="event" data-cursor-hover>Événementiel</button>
+      <button class="work__filter" data-wfilter="corporate" data-cursor-hover>Corporate &amp; Pub</button>
+      <button class="work__filter" data-wfilter="doc" data-cursor-hover>Documentaire</button>
+    </div>
+
+    <div class="work__grid" data-work-grid>
+
+      <article class="work__item" data-cat="clip-off" data-video="https://www.youtube.com/embed/p8Ogu5kSwWQ" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/p8Ogu5kSwWQ/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/p8Ogu5kSwWQ/hqdefault.jpg'" alt="« Li Lanla » — Rone" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">CLIP OFFICIEL</span>
+          <h3>« Li Lanla » — Rone</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+      <article class="work__item" data-cat="clip-off" data-video="https://www.youtube.com/embed/CG6PT-viw8c" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/CG6PT-viw8c/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/CG6PT-viw8c/hqdefault.jpg'" alt="« C'est Gâté » — Rone" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">CLIP OFFICIEL</span>
+          <h3>« C'est Gâté » — Rone</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+      <article class="work__item" data-cat="making" data-video="https://www.youtube.com/embed/hGYw_J8HTOY" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/hGYw_J8HTOY/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/hGYw_J8HTOY/hqdefault.jpg'" alt="« JIIN » — Amadeus" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">MAKING-OF · CLIP</span>
+          <h3>« JIIN » — Amadeus</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+      <article class="work__item" data-cat="corporate" data-video="https://www.youtube.com/embed/sEH4iaLsK7E" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/sEH4iaLsK7E/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/sEH4iaLsK7E/hqdefault.jpg'" alt="Arena SJP — Corporate" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">CORPORATE</span>
+          <h3>Arena SJP</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+      <article class="work__item" data-cat="doc" data-video="https://www.youtube.com/embed/k7bsLeHD4OU" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/k7bsLeHD4OU/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/k7bsLeHD4OU/hqdefault.jpg'" alt="L'Agriculteur — Mini-doc" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">DOCUMENTAIRE</span>
+          <h3>L'Agriculteur</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+      <article class="work__item" data-cat="corporate" data-video="https://www.youtube.com/embed/1tqu9rljJvM" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/1tqu9rljJvM/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/1tqu9rljJvM/hqdefault.jpg'" alt="CAN — Annonce des Lions" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">REPORTAGE · ANNONCE</span>
+          <h3>CAN — Annonce de la liste</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+      <article class="work__item" data-cat="event" data-video="https://www.youtube.com/embed/IEnatn7o3HY" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/IEnatn7o3HY/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/IEnatn7o3HY/hqdefault.jpg'" alt="Lancement de livre — Aftermovie" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">ÉVÉNEMENTIEL</span>
+          <h3>Lancement de livre — Aftermovie</h3>
+          <span class="work__year">2026</span>
+        </div>
+      </article>
+
+      <article class="work__item" data-cat="making" data-video="https://www.youtube.com/embed/OzfFnxkdkb4" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/OzfFnxkdkb4/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/OzfFnxkdkb4/hqdefault.jpg'" alt="« Kay Niou Pello Wave » — Making-Of" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">MAKING-OF · CLIP</span>
+          <h3>« Kay Niou Pello Wave » — Amadeus</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+      <article class="work__item" data-cat="making" data-video="https://www.youtube.com/embed/i7UG4k8oV1U" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/i7UG4k8oV1U/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/i7UG4k8oV1U/hqdefault.jpg'" alt="« YDD » — Making-Of" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">MAKING-OF · CLIP</span>
+          <h3>« YDD » — Amadeus</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+      <article class="work__item" data-cat="mariage" data-video="https://www.youtube.com/embed/onP77zIJGA4" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/onP77zIJGA4/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/onP77zIJGA4/hqdefault.jpg'" alt="Mariage — Teaser" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">MARIAGE</span>
+          <h3>Mariage — Teaser</h3>
+          <span class="work__year">2026</span>
+        </div>
+      </article>
+
+      <article class="work__item work__item--short" data-cat="concert" data-video="https://www.youtube.com/embed/sF_CJ1bsHXA" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/sF_CJ1bsHXA/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/sF_CJ1bsHXA/hqdefault.jpg'" alt="Samba Peuzzi — Concert" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">CONCERT · SHORT</span>
+          <h3>Samba Peuzzi — Concert</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+      <article class="work__item work__item--short" data-cat="making" data-video="https://www.youtube.com/embed/BMPfq96P8UQ" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/BMPfq96P8UQ/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/BMPfq96P8UQ/hqdefault.jpg'" alt="« Jeune Mara » — Making-Of" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">MAKING-OF · CLIP · SHORT</span>
+          <h3>« Jeune Mara » — Making-Of</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+      <article class="work__item work__item--short" data-cat="mariage" data-video="https://www.youtube.com/embed/zz4P08Ji0LY" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/zz4P08Ji0LY/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/zz4P08Ji0LY/hqdefault.jpg'" alt="Mariage à Saly" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">MARIAGE · SHORT</span>
+          <h3>Mariage à Saly</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+      <article class="work__item work__item--short" data-cat="corporate" data-video="https://www.youtube.com/embed/7eU9pTJIpNI" data-cursor-play>
+        <div class="work__thumb">
+          <img src="https://i.ytimg.com/vi/7eU9pTJIpNI/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/7eU9pTJIpNI/hqdefault.jpg'" alt="Mahwa Group — Publicité" loading="lazy" decoding="async" />
+        </div>
+        <div class="work__info">
+          <span class="work__cat">PUBLICITÉ · SHORT</span>
+          <h3>Mahwa Group</h3>
+          <span class="work__year">2025</span>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- PANNEAU PHOTOS -->
+  <section class="wpanel photo" data-panel="photos" id="photos" role="tabpanel" hidden>
+    <div class="photo__filters" data-filters>
+      <button class="photo__filter is-active" data-filter="all" data-cursor-hover>Tout</button>
+      <button class="photo__filter" data-filter="portrait" data-cursor-hover>Portrait</button>
+      <button class="photo__filter" data-filter="paysage" data-cursor-hover>Paysage</button>
+      <button class="photo__filter" data-filter="evenement" data-cursor-hover>Événement</button>
+      <button class="photo__filter" data-filter="street" data-cursor-hover>Street</button>
+    </div>
+
+    <div class="photo__grid" data-gallery>
+      <figure class="photo__item" data-cat="portrait" data-img="assets/photos/DSC03242.jpg">
+        <img src="assets/photos/DSC03242.jpg" alt="Portrait — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Portrait — 2025</figcaption>
+      </figure>
+      <figure class="photo__item" data-cat="portrait" data-img="assets/photos/DSC03245.jpg">
+        <img src="assets/photos/DSC03245.jpg" alt="Portrait — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Portrait — 2025</figcaption>
+      </figure>
+      <figure class="photo__item" data-cat="evenement" data-img="assets/photos/DSC03298.jpg">
+        <img src="assets/photos/DSC03298.jpg" alt="Scène d'événement — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Événement — 2025</figcaption>
+      </figure>
+      <figure class="photo__item" data-cat="evenement" data-img="assets/photos/DSC03312.jpg">
+        <img src="assets/photos/DSC03312.jpg" alt="Scène d'événement — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Événement — 2025</figcaption>
+      </figure>
+      <figure class="photo__item" data-cat="street" data-img="assets/photos/DSC03701.jpg">
+        <img src="assets/photos/DSC03701.jpg" alt="Scène de rue — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Street — 2024</figcaption>
+      </figure>
+      <figure class="photo__item" data-cat="street" data-img="assets/photos/DSC03706.jpg">
+        <img src="assets/photos/DSC03706.jpg" alt="Scène de rue — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Street — 2024</figcaption>
+      </figure>
+      <figure class="photo__item" data-cat="paysage" data-img="assets/photos/DSC03713.jpg">
+        <img src="assets/photos/DSC03713.jpg" alt="Paysage — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Paysage — 2024</figcaption>
+      </figure>
+      <figure class="photo__item" data-cat="paysage" data-img="assets/photos/DSC03715.jpg">
+        <img src="assets/photos/DSC03715.jpg" alt="Paysage — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Paysage — 2024</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- CTA bas de page -->
+  <section class="travaux-cta">
+    <h2>Un projet en tête ?</h2>
+    <p>Parlons-en — je réponds sous 48h.</p>
+    <div class="travaux-cta__btns">
+      <a href="index.html#contact" class="btn btn--primary" data-cursor-hover>
+        <span>Demander un devis</span>
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="index.html" class="btn btn--ghost" data-cursor-hover>Retour à l'accueil</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer__big">BAYE<br/>DAME<span class="footer__big-dot">.</span></div>
+    <div class="footer__cols">
+      <div>
+        <span>Navigation</span>
+        <a href="index.html#hero">Accueil</a>
+        <a href="index.html#services">Services</a>
+        <a href="travaux.html">Travaux</a>
+        <a href="index.html#cv">Parcours</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+      <div>
+        <span>Réseaux</span>
+        <a href="https://instagram.com/_bayedame" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.behance.net/medounebo1" target="_blank" rel="noopener">Behance</a>
+        <a href="mailto:medounebo0@gmail.com">Email</a>
+        <a href="tel:+221773758392">WhatsApp / Tel</a>
+      </div>
+      <div>
+        <span>Légal</span>
+        <a href="legal.html">Mentions légales</a>
+        <a href="legal.html#donnees-personnelles">Confidentialité</a>
+        <p class="footer__copy">© 2026 Baye Dame. Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" data-lightbox aria-hidden="true">
+    <button class="lightbox__close" data-lightbox-close aria-label="Fermer">✕</button>
+    <button class="lightbox__prev" data-lightbox-prev aria-label="Précédent">‹</button>
+    <button class="lightbox__next" data-lightbox-next aria-label="Suivant">›</button>
+    <div class="lightbox__content">
+      <img data-lightbox-img alt="" />
+      <p data-lightbox-caption></p>
+    </div>
+  </div>
+
+  <!-- VIDEO MODAL -->
+  <div class="vmodal" data-vmodal aria-hidden="true">
+    <button class="vmodal__close" data-vmodal-close aria-label="Fermer">✕</button>
+    <div class="vmodal__wrap" data-vmodal-wrap></div>
+  </div>
+
+  <script src="main.js"></script>
+  <script src="analytics.js" defer></script>
+</body>
+</html>

@@ -137,6 +137,9 @@
 </head>
 <body>
 
+  <!-- Lien d'évitement (clavier / lecteurs d'écran) -->
+  <a href="#hero" class="skip-link">Aller au contenu</a>
+
   <!-- BLOBS ATMOSPHÉRIQUES (warm + indigo en background) -->
   <div class="warm-blobs" aria-hidden="true">
     <div class="warm-blob warm-blob--1"></div>
@@ -169,14 +172,16 @@
   <!-- NAVIGATION -->
   <header class="nav">
     <a href="#hero" class="nav__logo" data-cursor-hover>BD<span>.</span></a>
-    <nav class="nav__links">
-      <a href="#work" data-cursor-hover>Travaux</a>
-      <a href="#photo" data-cursor-hover>Photo</a>
+    <nav class="nav__links" data-nav-links>
+      <a href="#services" data-cursor-hover>Services</a>
+      <a href="travaux.html" data-cursor-hover>Travaux</a>
+      <a href="travaux.html#photos" data-cursor-hover>Photo</a>
       <a href="#cv" data-cursor-hover>Parcours</a>
       <a href="#contact" data-cursor-hover>Contact</a>
+      <a href="assets/cv/CV.pdf" class="nav__links-cv" download data-cursor-hover>Télécharger le CV ↓</a>
     </nav>
     <a href="assets/cv/CV.pdf" class="nav__cv" download data-cursor-hover>CV ↓</a>
-    <button class="nav__burger" data-burger aria-label="Menu">
+    <button class="nav__burger" data-burger aria-label="Menu" aria-expanded="false">
       <span></span><span></span>
     </button>
   </header>
@@ -263,23 +268,108 @@
     </div>
   </section>
 
+  <!-- SERVICES — Bento grid (non numérotée, comme Manifesto/Trust) -->
+  <section class="services" id="services" aria-label="Services">
+    <div class="services__head">
+      <span class="services__label">Ce que je propose</span>
+      <h2 class="services__title">Des images qui <em>servent</em> ton message</h2>
+      <p class="services__desc">Du clip à la couverture d'événement, je t'accompagne du premier échange à la livraison finale. Choisis un service pour voir les travaux correspondants.</p>
+    </div>
+
+    <div class="bento" data-bento>
+
+      <a href="travaux.html#clip-off" class="bento__tile bento__tile--feature" data-wfilter="clip-off" data-cursor-hover style="--bi:0" aria-label="Voir mes clips et making-of">
+        <span class="bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v14H3z"/><path d="M3 9h18M7 5v4M11 5v4M15 5v4M19 5v4M7 19v-4M11 19v-4M15 19v-4M19 19v-4"/></svg>
+        </span>
+        <div class="bento__body">
+          <span class="bento__kicker">Phare</span>
+          <h3 class="bento__name">Clips &amp; <em>Making-of</em></h3>
+          <p class="bento__text">Réalisation, tournage et montage de clips officiels et de making-of pour artistes. Étalonnage cinéma, version YouTube + verticale Reels/TikTok.</p>
+          <div class="bento__chips">
+            <span>Réalisation</span><span>Étalonnage</span><span>Reels</span>
+          </div>
+        </div>
+        <span class="bento__go" aria-hidden="true">Voir les clips
+          <svg viewBox="0 0 24 24" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </a>
+
+      <a href="travaux.html#mariage" class="bento__tile" data-wfilter="mariage" data-cursor-hover style="--bi:1" aria-label="Voir mes films de mariage">
+        <span class="bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="14" r="5"/><circle cx="15" cy="14" r="5"/><path d="M7.5 9 9 5h6l1.5 4"/></svg>
+        </span>
+        <div class="bento__body">
+          <h3 class="bento__name">Films de <em>mariage</em></h3>
+          <p class="bento__text">Teaser + film souvenir, de la préparation à la soirée. Option drone et 2ᵉ caméra.</p>
+        </div>
+        <span class="bento__go" aria-hidden="true">Découvrir
+          <svg viewBox="0 0 24 24" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </a>
+
+      <a href="travaux.html#corporate" class="bento__tile" data-wfilter="corporate" data-cursor-hover style="--bi:2" aria-label="Voir mes vidéos corporate et publicités">
+        <span class="bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/><path d="M9 9h0M9 13h0M9 17h0"/></svg>
+        </span>
+        <div class="bento__body">
+          <h3 class="bento__name">Corporate &amp; <em>Pub</em></h3>
+          <p class="bento__text">Films d'entreprise, publicités et contenus de marque qui donnent envie.</p>
+        </div>
+        <span class="bento__go" aria-hidden="true">Découvrir
+          <svg viewBox="0 0 24 24" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </a>
+
+      <a href="travaux.html#concert" class="bento__tile" data-wfilter="concert" data-cursor-hover style="--bi:3" aria-label="Voir mes captations de concerts et événements">
+        <span class="bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg>
+        </span>
+        <div class="bento__body">
+          <h3 class="bento__name">Concerts &amp; <em>Live</em></h3>
+          <p class="bento__text">Captation multi-angle, aftermovies et capsules réseaux qui transmettent l'énergie.</p>
+        </div>
+        <span class="bento__go" aria-hidden="true">Découvrir
+          <svg viewBox="0 0 24 24" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </a>
+
+      <a href="travaux.html#photos" class="bento__tile" data-cursor-hover style="--bi:4" aria-label="Voir mes photographies">
+        <span class="bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6h0a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.5"/></svg>
+        </span>
+        <div class="bento__body">
+          <h3 class="bento__name"><em>Photo</em>graphie</h3>
+          <p class="bento__text">Portrait, événement, lifestyle. Retouche soignée, livraison HD rapide.</p>
+        </div>
+        <span class="bento__go" aria-hidden="true">Voir la galerie
+          <svg viewBox="0 0 24 24" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </a>
+
+      <a href="#contact" class="bento__tile bento__tile--accent" data-cursor-hover style="--bi:5" aria-label="Vues aériennes par drone — me contacter">
+        <span class="bento__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="5" r="2.5"/><circle cx="19" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M7 7l3.5 3.5M17 7l-3.5 3.5M7 17l3.5-3.5M17 17l-3.5-3.5"/><rect x="9.5" y="9.5" width="5" height="5" rx="1.2"/></svg>
+        </span>
+        <div class="bento__body">
+          <span class="bento__kicker bento__kicker--accent">Pilote breveté</span>
+          <h3 class="bento__name">Drone &amp; <em>Aérien</em></h3>
+          <p class="bento__text">Une autre dimension pour ton projet. Prises de vue aériennes en option sur toutes mes prestations.</p>
+        </div>
+        <span class="bento__go" aria-hidden="true">En parler
+          <svg viewBox="0 0 24 24" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </a>
+
+    </div>
+  </section>
+
   <!-- SHOWREEL / VIDÉOS -->
   <section class="work" id="work">
     <div class="section-head">
       <span class="section-head__num">01 —</span>
       <h2 class="section-head__title">Travaux <em>vidéo</em></h2>
-      <p class="section-head__desc">14 projets récents. Filtrez par catégorie, cliquez pour découvrir.</p>
-    </div>
-
-    <div class="work__filters" data-work-filters>
-      <button class="work__filter is-active" data-wfilter="all" data-cursor-hover>Tout</button>
-      <button class="work__filter" data-wfilter="clip-off" data-cursor-hover>Clip Officiel</button>
-      <button class="work__filter" data-wfilter="making" data-cursor-hover>Making-Of</button>
-      <button class="work__filter" data-wfilter="mariage" data-cursor-hover>Mariage</button>
-      <button class="work__filter" data-wfilter="concert" data-cursor-hover>Concert</button>
-      <button class="work__filter" data-wfilter="event" data-cursor-hover>Événementiel</button>
-      <button class="work__filter" data-wfilter="corporate" data-cursor-hover>Corporate &amp; Pub</button>
-      <button class="work__filter" data-wfilter="doc" data-cursor-hover>Documentaire</button>
+      <p class="section-head__desc">Un aperçu de mes réalisations récentes. Retrouvez l'ensemble des projets — vidéos et photos — sur la page Travaux.</p>
     </div>
 
     <div class="work__grid" data-work-grid>
@@ -291,17 +381,6 @@
         <div class="work__info">
           <span class="work__cat">CLIP OFFICIEL</span>
           <h3>« Li Lanla » — Rone</h3>
-          <span class="work__year">2025</span>
-        </div>
-      </article>
-
-      <article class="work__item" data-cat="clip-off" data-video="https://www.youtube.com/embed/CG6PT-viw8c" data-cursor-play>
-        <div class="work__thumb">
-          <img src="https://i.ytimg.com/vi/CG6PT-viw8c/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/CG6PT-viw8c/hqdefault.jpg'" alt="« C'est Gâté » — Rone" loading="lazy" decoding="async" />
-        </div>
-        <div class="work__info">
-          <span class="work__cat">CLIP OFFICIEL</span>
-          <h3>« C'est Gâté » — Rone</h3>
           <span class="work__year">2025</span>
         </div>
       </article>
@@ -328,28 +407,6 @@
         </div>
       </article>
 
-      <article class="work__item" data-cat="doc" data-video="https://www.youtube.com/embed/k7bsLeHD4OU" data-cursor-play>
-        <div class="work__thumb">
-          <img src="https://i.ytimg.com/vi/k7bsLeHD4OU/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/k7bsLeHD4OU/hqdefault.jpg'" alt="L'Agriculteur — Mini-doc" loading="lazy" decoding="async" />
-        </div>
-        <div class="work__info">
-          <span class="work__cat">DOCUMENTAIRE</span>
-          <h3>L'Agriculteur</h3>
-          <span class="work__year">2025</span>
-        </div>
-      </article>
-
-      <article class="work__item" data-cat="corporate" data-video="https://www.youtube.com/embed/1tqu9rljJvM" data-cursor-play>
-        <div class="work__thumb">
-          <img src="https://i.ytimg.com/vi/1tqu9rljJvM/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/1tqu9rljJvM/hqdefault.jpg'" alt="CAN — Annonce des Lions" loading="lazy" decoding="async" />
-        </div>
-        <div class="work__info">
-          <span class="work__cat">REPORTAGE · ANNONCE</span>
-          <h3>CAN — Annonce de la liste</h3>
-          <span class="work__year">2025</span>
-        </div>
-      </article>
-
       <article class="work__item" data-cat="event" data-video="https://www.youtube.com/embed/IEnatn7o3HY" data-cursor-play>
         <div class="work__thumb">
           <img src="https://i.ytimg.com/vi/IEnatn7o3HY/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/IEnatn7o3HY/hqdefault.jpg'" alt="Lancement de livre — Aftermovie" loading="lazy" decoding="async" />
@@ -358,28 +415,6 @@
           <span class="work__cat">ÉVÉNEMENTIEL</span>
           <h3>Lancement de livre — Aftermovie</h3>
           <span class="work__year">2026</span>
-        </div>
-      </article>
-
-      <article class="work__item" data-cat="making" data-video="https://www.youtube.com/embed/OzfFnxkdkb4" data-cursor-play>
-        <div class="work__thumb">
-          <img src="https://i.ytimg.com/vi/OzfFnxkdkb4/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/OzfFnxkdkb4/hqdefault.jpg'" alt="« Kay Niou Pello Wave » — Making-Of" loading="lazy" decoding="async" />
-        </div>
-        <div class="work__info">
-          <span class="work__cat">MAKING-OF · CLIP</span>
-          <h3>« Kay Niou Pello Wave » — Amadeus</h3>
-          <span class="work__year">2025</span>
-        </div>
-      </article>
-
-      <article class="work__item" data-cat="making" data-video="https://www.youtube.com/embed/i7UG4k8oV1U" data-cursor-play>
-        <div class="work__thumb">
-          <img src="https://i.ytimg.com/vi/i7UG4k8oV1U/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/i7UG4k8oV1U/hqdefault.jpg'" alt="« YDD » — Making-Of" loading="lazy" decoding="async" />
-        </div>
-        <div class="work__info">
-          <span class="work__cat">MAKING-OF · CLIP</span>
-          <h3>« YDD » — Amadeus</h3>
-          <span class="work__year">2025</span>
         </div>
       </article>
 
@@ -405,39 +440,13 @@
         </div>
       </article>
 
-      <article class="work__item work__item--short" data-cat="making" data-video="https://www.youtube.com/embed/BMPfq96P8UQ" data-cursor-play>
-        <div class="work__thumb">
-          <img src="https://i.ytimg.com/vi/BMPfq96P8UQ/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/BMPfq96P8UQ/hqdefault.jpg'" alt="« Jeune Mara » — Making-Of" loading="lazy" decoding="async" />
-        </div>
-        <div class="work__info">
-          <span class="work__cat">MAKING-OF · CLIP · SHORT</span>
-          <h3>« Jeune Mara » — Making-Of</h3>
-          <span class="work__year">2025</span>
-        </div>
-      </article>
+    </div>
 
-      <article class="work__item work__item--short" data-cat="mariage" data-video="https://www.youtube.com/embed/zz4P08Ji0LY" data-cursor-play>
-        <div class="work__thumb">
-          <img src="https://i.ytimg.com/vi/zz4P08Ji0LY/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/zz4P08Ji0LY/hqdefault.jpg'" alt="Mariage à Saly" loading="lazy" decoding="async" />
-        </div>
-        <div class="work__info">
-          <span class="work__cat">MARIAGE · SHORT</span>
-          <h3>Mariage à Saly</h3>
-          <span class="work__year">2025</span>
-        </div>
-      </article>
-
-      <article class="work__item work__item--short" data-cat="corporate" data-video="https://www.youtube.com/embed/7eU9pTJIpNI" data-cursor-play>
-        <div class="work__thumb">
-          <img src="https://i.ytimg.com/vi/7eU9pTJIpNI/maxresdefault.jpg" onerror="this.src='https://i.ytimg.com/vi/7eU9pTJIpNI/hqdefault.jpg'" alt="Mahwa Group — Publicité" loading="lazy" decoding="async" />
-        </div>
-        <div class="work__info">
-          <span class="work__cat">PUBLICITÉ · SHORT</span>
-          <h3>Mahwa Group</h3>
-          <span class="work__year">2025</span>
-        </div>
-      </article>
-
+    <div class="section-cta">
+      <a href="travaux.html" class="btn btn--primary" data-cursor-hover>
+        <span>Voir tous les travaux</span>
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
     </div>
   </section>
 
@@ -446,50 +455,33 @@
     <div class="section-head">
       <span class="section-head__num">02 —</span>
       <h2 class="section-head__title">Photo<em>graphies</em></h2>
-      <p class="section-head__desc">Portraits, paysages, scènes de vie.</p>
-    </div>
-
-    <div class="photo__filters" data-filters>
-      <button class="photo__filter is-active" data-filter="all" data-cursor-hover>Tout</button>
-      <button class="photo__filter" data-filter="portrait" data-cursor-hover>Portrait</button>
-      <button class="photo__filter" data-filter="paysage" data-cursor-hover>Paysage</button>
-      <button class="photo__filter" data-filter="evenement" data-cursor-hover>Événement</button>
-      <button class="photo__filter" data-filter="street" data-cursor-hover>Street</button>
+      <p class="section-head__desc">Portraits, paysages, scènes de vie — un aperçu. La galerie complète est sur la page Travaux.</p>
     </div>
 
     <div class="photo__grid" data-gallery>
       <figure class="photo__item" data-cat="portrait" data-img="assets/photos/DSC03242.jpg">
-        <img src="assets/photos/DSC03242.jpg" alt="Photographie Baye Dame" loading="lazy" decoding="async" />
-        <figcaption>Photographie — 2025</figcaption>
-      </figure>
-      <figure class="photo__item" data-cat="portrait" data-img="assets/photos/DSC03245.jpg">
-        <img src="assets/photos/DSC03245.jpg" alt="Photographie Baye Dame" loading="lazy" decoding="async" />
-        <figcaption>Photographie — 2025</figcaption>
+        <img src="assets/photos/DSC03242.jpg" alt="Portrait — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Portrait — 2025</figcaption>
       </figure>
       <figure class="photo__item" data-cat="evenement" data-img="assets/photos/DSC03298.jpg">
-        <img src="assets/photos/DSC03298.jpg" alt="Photographie Baye Dame" loading="lazy" decoding="async" />
-        <figcaption>Photographie — 2025</figcaption>
-      </figure>
-      <figure class="photo__item" data-cat="evenement" data-img="assets/photos/DSC03312.jpg">
-        <img src="assets/photos/DSC03312.jpg" alt="Photographie Baye Dame" loading="lazy" decoding="async" />
-        <figcaption>Photographie — 2025</figcaption>
+        <img src="assets/photos/DSC03298.jpg" alt="Scène d'événement — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Événement — 2025</figcaption>
       </figure>
       <figure class="photo__item" data-cat="street" data-img="assets/photos/DSC03701.jpg">
-        <img src="assets/photos/DSC03701.jpg" alt="Photographie Baye Dame" loading="lazy" decoding="async" />
-        <figcaption>Photographie — 2024</figcaption>
-      </figure>
-      <figure class="photo__item" data-cat="street" data-img="assets/photos/DSC03706.jpg">
-        <img src="assets/photos/DSC03706.jpg" alt="Photographie Baye Dame" loading="lazy" decoding="async" />
-        <figcaption>Photographie — 2024</figcaption>
+        <img src="assets/photos/DSC03701.jpg" alt="Scène de rue — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Street — 2024</figcaption>
       </figure>
       <figure class="photo__item" data-cat="paysage" data-img="assets/photos/DSC03713.jpg">
-        <img src="assets/photos/DSC03713.jpg" alt="Photographie Baye Dame" loading="lazy" decoding="async" />
-        <figcaption>Photographie — 2024</figcaption>
+        <img src="assets/photos/DSC03713.jpg" alt="Paysage — photographie de Baye Dame" loading="lazy" decoding="async" />
+        <figcaption>Paysage — 2024</figcaption>
       </figure>
-      <figure class="photo__item" data-cat="paysage" data-img="assets/photos/DSC03715.jpg">
-        <img src="assets/photos/DSC03715.jpg" alt="Photographie Baye Dame" loading="lazy" decoding="async" />
-        <figcaption>Photographie — 2024</figcaption>
-      </figure>
+    </div>
+
+    <div class="section-cta">
+      <a href="travaux.html#photos" class="btn btn--ghost" data-cursor-hover>
+        <span>Voir toute la galerie</span>
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
     </div>
   </section>
 
